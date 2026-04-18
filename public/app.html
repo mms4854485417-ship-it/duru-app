@@ -257,6 +257,57 @@ body{background:#0F0E0C;font-family:'Pretendard',sans-serif;min-height:100vh;dis
 @keyframes splashDot{0%,100%{opacity:.25;transform:translateY(0);}50%{opacity:1;transform:translateY(-4px);}}
 @keyframes splashFadeOut{from{opacity:1;}to{opacity:0;pointer-events:none;}}
 
+/* ══ 온보딩 ══ */
+#onboarding-overlay{position:absolute;inset:0;background:#F9F8F4;z-index:8500;display:none;flex-direction:column;align-items:center;overflow:hidden;}
+#onboarding-overlay.show{display:flex;}
+.ob-step{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:0 28px;}
+.ob-step.show{display:flex;}
+/* ─ 이름입력 단계 ─ */
+#ob-step-name .ob-duru-wrap{position:relative;margin-bottom:20px;}
+.ob-bubble{background:#1A1A14;color:#fff;font-size:13px;font-weight:600;line-height:1.55;border-radius:16px 16px 16px 4px;padding:12px 16px;margin-bottom:20px;text-align:center;word-break:keep-all;max-width:240px;}
+.ob-bubble span{color:#F1948A;}
+.ob-name-input{width:100%;background:rgba(26,26,20,.06);border:1.5px solid rgba(26,26,20,.12);border-radius:14px;padding:14px 16px;font-size:17px;font-weight:700;font-family:'Pretendard',sans-serif;color:#1A1A14;text-align:center;outline:none;transition:border-color .2s;}
+.ob-name-input:focus{border-color:#C0392B;}
+.ob-name-input::placeholder{color:#BBBBB0;font-weight:500;}
+.ob-btn{width:100%;padding:16px;border-radius:16px;border:none;background:#1A1A14;color:#fff;font-size:16px;font-weight:800;font-family:'Pretendard',sans-serif;cursor:pointer;margin-top:14px;transition:transform .15s,opacity .15s;}
+.ob-btn:active{transform:scale(.97);}
+.ob-btn:disabled{opacity:.35;cursor:default;}
+/* ─ 반가워요 단계 ─ */
+#ob-step-greeting{gap:0;}
+.ob-greeting-text{font-size:26px;font-weight:900;color:#1A1A14;text-align:center;line-height:1.3;margin-top:24px;word-break:keep-all;}
+.ob-greeting-text span{color:#C0392B;}
+.ob-greeting-sub{font-size:14px;color:#888;margin-top:10px;text-align:center;word-break:keep-all;}
+/* ─ 슬라이드 단계 ─ */
+#ob-step-slides{justify-content:space-between;padding:60px 0 36px;}
+.ob-slides-inner{width:100%;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;}
+.ob-slide{display:none;flex-direction:column;align-items:center;padding:0 32px;text-align:center;}
+.ob-slide.active{display:flex;}
+.ob-slide-icon{width:88px;height:88px;border-radius:28px;background:#1A1A14;display:flex;align-items:center;justify-content:center;margin-bottom:24px;flex-shrink:0;}
+.ob-slide-title{font-size:20px;font-weight:900;color:#1A1A14;margin-bottom:10px;line-height:1.3;}
+.ob-slide-desc{font-size:14px;color:#666;line-height:1.75;word-break:keep-all;}
+.ob-slide-tag{display:inline-block;background:rgba(192,57,43,.1);color:#C0392B;font-size:11px;font-weight:700;border-radius:8px;padding:4px 10px;margin-bottom:14px;letter-spacing:.04em;}
+.ob-dots{display:flex;gap:7px;align-items:center;flex-shrink:0;margin:24px 0 20px;}
+.ob-dot{width:7px;height:7px;border-radius:50%;background:rgba(26,26,20,.15);transition:all .3s;}
+.ob-dot.on{width:22px;border-radius:4px;background:#1A1A14;}
+.ob-slides-nav{width:calc(100% - 56px);display:flex;gap:10px;}
+.ob-slide-next{flex:1;padding:16px;border-radius:16px;border:none;background:#1A1A14;color:#fff;font-size:16px;font-weight:800;font-family:'Pretendard',sans-serif;cursor:pointer;transition:transform .15s;}
+.ob-slide-next:active{transform:scale(.97);}
+.ob-slide-back{width:52px;padding:16px;border-radius:16px;border:1.5px solid rgba(26,26,20,.14);background:transparent;color:#888;font-size:16px;cursor:pointer;font-family:'Pretendard',sans-serif;transition:transform .15s;}
+.ob-slide-back:active{transform:scale(.97);}
+/* ─ 시작하기 단계 ─ */
+#ob-step-start{gap:0;}
+.ob-start-text{font-size:22px;font-weight:900;color:#1A1A14;text-align:center;line-height:1.4;margin-top:24px;word-break:keep-all;}
+.ob-start-text span{color:#C0392B;}
+.ob-start-sub{font-size:14px;color:#888;margin-top:10px;text-align:center;line-height:1.6;word-break:keep-all;}
+.ob-start-btn{margin-top:36px;padding:18px 48px;border-radius:18px;border:none;background:#1A1A14;color:#fff;font-size:16px;font-weight:800;font-family:'Pretendard',sans-serif;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 20px rgba(26,26,20,.25);}
+.ob-start-btn:active{transform:scale(.97);}
+/* 두루 고개 까딱 */
+@keyframes obDuruNod{0%,100%{transform:rotate(0deg);}30%{transform:rotate(-8deg);}60%{transform:rotate(6deg);}80%{transform:rotate(-4deg);}}
+.ob-duru-nod{animation:obDuruNod .6s ease-in-out;}
+/* 두루 등장 */
+@keyframes obDuruIn{0%{opacity:0;transform:translateY(24px);}100%{opacity:1;transform:translateY(0);}}
+.ob-duru-in{animation:obDuruIn .55s cubic-bezier(.16,1,.3,1) both;}
+
 @keyframes duruRiseUp{
   0%  {transform:translateX(-50%) translateY(60px);opacity:0;}
   100%{transform:translateX(-50%) translateY(0);opacity:1;}
@@ -1078,6 +1129,165 @@ async function signOut() {
         <div style="width:5px;height:5px;border-radius:50%;background:#C0392B;animation:splashDot .8s ease-in-out infinite .3s;"></div>
       </div>
     </div>
+
+    <!-- ══════ 온보딩 오버레이 ══════ -->
+    <div id="onboarding-overlay">
+
+      <!-- 단계 0: 두루 등장 + 이름 입력 -->
+      <div id="ob-step-name" class="ob-step">
+        <div class="ob-duru-wrap ob-duru-in">
+          <svg width="120" height="138" viewBox="-8 -78 216 310" fill="none">
+            <g id="ob-duru-body" style="transform-origin:50% 50%;">
+              <path d="M22 82 Q2 70 -1 86 Q2 106 22 96" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.4"/>
+              <path d="M84 82 Q104 70 107 86 Q104 106 84 96" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.4"/>
+              <ellipse cx="53" cy="108" rx="38" ry="32" fill="white" stroke="#1A1A14" stroke-width="2.6"/>
+              <path d="M37 130 Q33 146 45 152 Q54 156 64 150 Q70 142 66 130" fill="rgba(26,26,20,.04)" stroke="#1A1A14" stroke-width="2.2"/>
+              <path d="M36 136 L28 172" stroke="#1A1A14" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+              <path d="M17 172 Q28 169 34 174" stroke="#1A1A14" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+              <path d="M66 136 L76 172" stroke="#1A1A14" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+              <path d="M70 172 Q76 169 88 174" stroke="#1A1A14" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+              <path d="M50 78 Q47 64 50 50 Q52 39 55 27" stroke="#1A1A14" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <ellipse cx="58" cy="20" rx="22" ry="21" fill="white" stroke="#1A1A14" stroke-width="2.4"/>
+              <ellipse cx="56" cy="8" rx="13" ry="8.5" fill="#C0392B"/>
+              <ellipse cx="54" cy="7" rx="8.5" ry="5.5" fill="#CC3A2A"/>
+              <ellipse cx="50" cy="5" rx="5.5" ry="3" fill="rgba(255,255,255,.28)" transform="rotate(-18 50 5)"/>
+              <ellipse cx="50" cy="20" rx="7" ry="7.5" fill="white" stroke="#1A1A14" stroke-width="1.5"/>
+              <ellipse cx="51" cy="20" rx="4.5" ry="5" fill="#1A1A14"/>
+              <circle cx="52.5" cy="18" r="1.6" fill="white"/>
+              <path d="M74 18 L88 15 L74 25z" fill="#1A1A14" opacity=".9"/>
+            </g>
+          </svg>
+        </div>
+        <div class="ob-bubble">안녕하세요! 저는 <span>두루</span>예요.<br>이름을 알려주시면 반갑게 불러드릴게요 :)</div>
+        <input id="ob-name-input" class="ob-name-input" type="text" placeholder="이름을 입력해주세요" maxlength="10" autocomplete="off"/>
+        <button id="ob-name-btn" class="ob-btn" disabled>확인</button>
+      </div>
+
+      <!-- 단계 1: 반가워요! -->
+      <div id="ob-step-greeting" class="ob-step">
+        <div id="ob-greeting-duru">
+          <svg width="120" height="138" viewBox="-8 -78 216 310" fill="none">
+            <g id="ob-greet-body" style="transform-origin:53px 20px;">
+              <path d="M22 82 Q2 70 -1 86 Q2 106 22 96" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.4"/>
+              <path d="M84 82 Q104 70 107 86 Q104 106 84 96" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.4"/>
+              <ellipse cx="53" cy="108" rx="38" ry="32" fill="white" stroke="#1A1A14" stroke-width="2.6"/>
+              <path d="M37 130 Q33 146 45 152 Q54 156 64 150 Q70 142 66 130" fill="rgba(26,26,20,.04)" stroke="#1A1A14" stroke-width="2.2"/>
+              <path d="M36 136 L28 172" stroke="#1A1A14" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+              <path d="M17 172 Q28 169 34 174" stroke="#1A1A14" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+              <path d="M66 136 L76 172" stroke="#1A1A14" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+              <path d="M70 172 Q76 169 88 174" stroke="#1A1A14" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+              <path d="M50 78 Q47 64 50 50 Q52 39 55 27" stroke="#1A1A14" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <ellipse cx="58" cy="20" rx="22" ry="21" fill="white" stroke="#1A1A14" stroke-width="2.4"/>
+              <ellipse cx="56" cy="8" rx="13" ry="8.5" fill="#C0392B"/>
+              <ellipse cx="54" cy="7" rx="8.5" ry="5.5" fill="#CC3A2A"/>
+              <ellipse cx="50" cy="5" rx="5.5" ry="3" fill="rgba(255,255,255,.28)" transform="rotate(-18 50 5)"/>
+              <!-- 기쁜 눈: 초승달 모양 -->
+              <path d="M44 21 Q50 15 56 21" stroke="#1A1A14" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M74 18 L88 15 L74 25z" fill="#1A1A14" opacity=".9"/>
+            </g>
+          </svg>
+        </div>
+        <div class="ob-greeting-text">반가워요, <span id="ob-name-display">OOO</span>님!</div>
+        <div class="ob-greeting-sub">함께해서 기뻐요 ☺</div>
+      </div>
+
+      <!-- 단계 2: 기능 슬라이드 -->
+      <div id="ob-step-slides" class="ob-step">
+        <div class="ob-slides-inner">
+          <!-- 슬라이드 1: 기록 -->
+          <div class="ob-slide active" data-idx="0">
+            <div class="ob-slide-icon">
+              <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+                <rect x="10" y="8" width="24" height="28" rx="4" fill="none" stroke="white" stroke-width="2"/>
+                <line x1="15" y1="16" x2="29" y2="16" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+                <line x1="15" y1="21" x2="29" y2="21" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+                <line x1="15" y1="26" x2="24" y2="26" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+                <circle cx="31" cy="31" r="6" fill="#C0392B"/>
+                <line x1="31" y1="28" x2="31" y2="34" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+                <line x1="28" y1="31" x2="34" y2="31" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="ob-slide-tag">기록</div>
+            <div class="ob-slide-title">오늘 하루,<br>어떤 마음이었나요?</div>
+            <div class="ob-slide-desc">감정을 고르고, 하루를 적어보세요.<br>두루가 오늘의 마음을 함께 간직해 드릴게요.</div>
+          </div>
+          <!-- 슬라이드 2: 저장방식 -->
+          <div class="ob-slide" data-idx="1">
+            <div class="ob-slide-icon">
+              <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+                <circle cx="16" cy="22" r="7" fill="none" stroke="white" stroke-width="2"/>
+                <circle cx="30" cy="14" r="5" fill="none" stroke="white" stroke-width="2"/>
+                <circle cx="30" cy="30" r="5" fill="none" stroke="white" stroke-width="2"/>
+                <line x1="22.5" y1="19" x2="25.5" y2="16.5" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+                <line x1="22.5" y1="25" x2="25.5" y2="27.5" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="ob-slide-tag">저장방식</div>
+            <div class="ob-slide-title">나만 간직하거나,<br>익명으로 나누거나</div>
+            <div class="ob-slide-desc"><b style="color:#1A1A14;">비공개</b>로 혼자 품거나, <b style="color:#1A1A14;">공유</b>로 익명 피드에 올리거나,<br><b style="color:#1A1A14;">날려보내기</b>로 내 보관함에만 조용히 저장할 수 있어요.<br><span style="color:#C0392B;font-size:12px;">※ 날려보내기는 삭제가 아니에요 — 내 책에 남아요.</span></div>
+          </div>
+          <!-- 슬라이드 3: 책 -->
+          <div class="ob-slide" data-idx="2">
+            <div class="ob-slide-icon">
+              <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+                <rect x="9" y="8" width="18" height="28" rx="2" fill="none" stroke="white" stroke-width="2"/>
+                <rect x="17" y="8" width="18" height="28" rx="2" fill="rgba(255,255,255,.15)" stroke="white" stroke-width="2"/>
+                <line x1="22" y1="15" x2="30" y2="15" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="22" y1="20" x2="30" y2="20" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="22" y1="25" x2="28" y2="25" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="ob-slide-tag">연말 책</div>
+            <div class="ob-slide-title">차곡차곡 쌓인<br>당신의 1년</div>
+            <div class="ob-slide-desc">매일의 기록이 모여 연말에 한 권의 책이 됩니다.<br>오늘의 두 줄이 내년의 나를 위한 선물이 될 거예요.</div>
+          </div>
+        </div>
+        <!-- 페이지 도트 -->
+        <div class="ob-dots">
+          <div class="ob-dot on" data-dot="0"></div>
+          <div class="ob-dot" data-dot="1"></div>
+          <div class="ob-dot" data-dot="2"></div>
+        </div>
+        <!-- 네비게이션 버튼 -->
+        <div class="ob-slides-nav">
+          <button class="ob-slide-back" id="ob-slide-back" style="display:none;">←</button>
+          <button class="ob-slide-next" id="ob-slide-next">다음</button>
+        </div>
+      </div>
+
+      <!-- 단계 3: 시작하기 -->
+      <div id="ob-step-start" class="ob-step">
+        <div id="ob-start-duru">
+          <svg width="120" height="138" viewBox="-8 -78 216 310" fill="none">
+            <g style="animation:homeDuruFloat 3s ease-in-out infinite;">
+              <path d="M22 82 Q2 70 -1 86 Q2 106 22 96" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.4"/>
+              <path d="M84 82 Q104 70 107 86 Q104 106 84 96" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.4"/>
+              <ellipse cx="53" cy="108" rx="38" ry="32" fill="white" stroke="#1A1A14" stroke-width="2.6"/>
+              <path d="M37 130 Q33 146 45 152 Q54 156 64 150 Q70 142 66 130" fill="rgba(26,26,20,.04)" stroke="#1A1A14" stroke-width="2.2"/>
+              <path d="M36 136 L28 172" stroke="#1A1A14" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+              <path d="M17 172 Q28 169 34 174" stroke="#1A1A14" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+              <path d="M66 136 L76 172" stroke="#1A1A14" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+              <path d="M70 172 Q76 169 88 174" stroke="#1A1A14" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+              <path d="M50 78 Q47 64 50 50 Q52 39 55 27" stroke="#1A1A14" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <ellipse cx="58" cy="20" rx="22" ry="21" fill="white" stroke="#1A1A14" stroke-width="2.4"/>
+              <ellipse cx="56" cy="8" rx="13" ry="8.5" fill="#C0392B"/>
+              <ellipse cx="54" cy="7" rx="8.5" ry="5.5" fill="#CC3A2A"/>
+              <ellipse cx="50" cy="5" rx="5.5" ry="3" fill="rgba(255,255,255,.28)" transform="rotate(-18 50 5)"/>
+              <ellipse cx="50" cy="20" rx="7" ry="7.5" fill="white" stroke="#1A1A14" stroke-width="1.5"/>
+              <ellipse cx="51" cy="20" rx="4.5" ry="5" fill="#1A1A14"/>
+              <circle cx="52.5" cy="18" r="1.6" fill="white"/>
+              <path d="M74 18 L88 15 L74 25z" fill="#1A1A14" opacity=".9"/>
+            </g>
+          </svg>
+        </div>
+        <div class="ob-bubble" style="margin-top:20px;border-radius:16px 16px 16px 4px;">이제 저와 함께<br>시작해 볼까요?</div>
+        <div class="ob-start-text">매일의 마음을<br><span>기록</span>하는 시간</div>
+        <div class="ob-start-sub">오늘부터 두루와 함께,<br>하루 한 줄씩 당신의 이야기를 써보세요.</div>
+        <button class="ob-start-btn" id="ob-start-btn">시작하기 →</button>
+      </div>
+
+    </div>
+    <!-- ══════════════════════════════ -->
 
     <!-- ── AI 두루 고정 레이어 (화면 전환과 무관하게 항상 phone 위에 표시) ── -->
     <div id="ai-duru-fixed">
@@ -4492,7 +4702,8 @@ window.addEventListener('load', ()=>{
             greetEl.style.transition = 'opacity .4s ease';
             greetEl.style.opacity = '0';
             setTimeout(() => {
-              greetEl.innerHTML = pick[0] + '<br>' + pick[1];
+              const _uname2 = localStorage.getItem('duru_user_name') || '민준';
+              greetEl.innerHTML = (pick[0] + '<br>' + pick[1]).replace(/민준/g, _uname2);
               greetEl.style.opacity = '1';
             }, 350);
           }
@@ -4571,7 +4782,10 @@ window.addEventListener('load', ()=>{
 
     const pick = window._pickGreeting(null);
     const greetEl = document.getElementById('home-greeting');
-    if (greetEl) greetEl.innerHTML = pick[0] + '<br>' + pick[1];
+    if (greetEl) {
+      const _uname = localStorage.getItem('duru_user_name') || '민준';
+      greetEl.innerHTML = (pick[0] + '<br>' + pick[1]).replace(/민준/g, _uname);
+    }
 
     applyTimeBg(period);
   })();
@@ -4608,7 +4822,13 @@ window.addEventListener('load', ()=>{
   setTimeout(()=>{
     splash.style.transition='opacity .5s ease';
     splash.style.opacity='0';
-    setTimeout(()=>{ splash.style.display='none'; }, 500);
+    setTimeout(()=>{
+      splash.style.display='none';
+      // 온보딩 완료 여부 확인
+      if (!localStorage.getItem('duru_onboarding')) {
+        initOnboarding();
+      }
+    }, 500);
   }, 1800);
 
   // 초기 렌더링
@@ -4619,7 +4839,151 @@ window.addEventListener('load', ()=>{
   if (localStorage.getItem('theme') === 'dark') setTheme('dark', true);
   else if (localStorage.getItem('theme') === 'auto') setTheme('auto', true);
   else setTheme('light', true);
+
+  // 저장된 이름으로 UI 업데이트 (온보딩 완료한 경우)
+  const _savedName = localStorage.getItem('duru_user_name');
+  if (_savedName) {
+    setTimeout(() => applyUserName(_savedName), 100);
+  }
 });
+
+/* ══════════════════════════════
+   온보딩 로직
+══════════════════════════════ */
+function initOnboarding() {
+  const overlay = document.getElementById('onboarding-overlay');
+  if (!overlay) return;
+  overlay.classList.add('show');
+
+  // ─ 단계 전환 헬퍼
+  function showStep(id) {
+    document.querySelectorAll('.ob-step').forEach(el => el.classList.remove('show'));
+    const el = document.getElementById(id);
+    if (el) el.classList.add('show');
+  }
+
+  // ─ 단계 0: 이름 입력
+  showStep('ob-step-name');
+  const nameInput = document.getElementById('ob-name-input');
+  const nameBtn   = document.getElementById('ob-name-btn');
+
+  nameInput.addEventListener('input', () => {
+    nameBtn.disabled = nameInput.value.trim().length === 0;
+  });
+  nameInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !nameBtn.disabled) nameBtn.click();
+  });
+  setTimeout(() => nameInput.focus(), 300);
+
+  nameBtn.addEventListener('click', () => {
+    const name = nameInput.value.trim();
+    if (!name) return;
+
+    // 이름 저장 (localStorage + Supabase)
+    localStorage.setItem('duru_user_name', name);
+    if (window._sb) {
+      _sb.auth.updateUser({ data: { display_name: name } }).catch(() => {});
+    }
+
+    // 단계 1: 반가워요!
+    document.getElementById('ob-name-display').textContent = name;
+    showStep('ob-step-greeting');
+
+    // 두루 고개 까딱 애니메이션
+    const greetBody = document.getElementById('ob-greet-body');
+    if (greetBody) {
+      greetBody.classList.add('ob-duru-nod');
+      setTimeout(() => greetBody.classList.remove('ob-duru-nod'), 700);
+    }
+
+    // 1.6초 후 슬라이드로 이동
+    setTimeout(() => {
+      showStep('ob-step-slides');
+      initSlides(name);
+    }, 1600);
+  });
+}
+
+function initSlides(userName) {
+  let currentSlide = 0;
+  const slides    = document.querySelectorAll('.ob-slide');
+  const dots      = document.querySelectorAll('.ob-dot');
+  const nextBtn   = document.getElementById('ob-slide-next');
+  const backBtn   = document.getElementById('ob-slide-back');
+
+  function goTo(idx) {
+    slides.forEach((s, i) => s.classList.toggle('active', i === idx));
+    dots.forEach((d, i) => d.classList.toggle('on', i === idx));
+    currentSlide = idx;
+    backBtn.style.display = idx === 0 ? 'none' : '';
+    nextBtn.textContent = idx === slides.length - 1 ? '완료' : '다음';
+  }
+
+  nextBtn.addEventListener('click', () => {
+    if (currentSlide < slides.length - 1) {
+      goTo(currentSlide + 1);
+    } else {
+      // 마지막 슬라이드 → 시작하기 단계
+      showStep('ob-step-start');
+      initStart(userName);
+    }
+  });
+  backBtn.addEventListener('click', () => {
+    if (currentSlide > 0) goTo(currentSlide - 1);
+  });
+
+  dots.forEach(d => {
+    d.addEventListener('click', () => goTo(parseInt(d.dataset.dot)));
+  });
+
+  goTo(0);
+
+  function showStep(id) {
+    document.querySelectorAll('.ob-step').forEach(el => el.classList.remove('show'));
+    const el = document.getElementById(id);
+    if (el) el.classList.add('show');
+  }
+}
+
+function initStart(userName) {
+  const startBtn = document.getElementById('ob-start-btn');
+  startBtn.addEventListener('click', () => {
+    // 온보딩 완료 표시
+    localStorage.setItem('duru_onboarding', 'done');
+
+    // 홈 인사말에 이름 반영
+    updateHomeGreetingName(userName);
+
+    // 오버레이 페이드아웃 후 홈으로
+    const overlay = document.getElementById('onboarding-overlay');
+    overlay.style.transition = 'opacity .5s ease';
+    overlay.style.opacity = '0';
+    setTimeout(() => {
+      overlay.style.display = 'none';
+      overlay.classList.remove('show');
+    }, 500);
+  });
+}
+
+function updateHomeGreetingName(name) {
+  applyUserName(name);
+}
+
+function applyUserName(name) {
+  // home-greeting
+  const greetEl = document.getElementById('home-greeting');
+  if (greetEl) greetEl.innerHTML = greetEl.innerHTML.replace(/민준/g, name);
+  // mypage 이름 (안녕하세요, 민준님)
+  document.querySelectorAll('[id^="mypage"]').forEach(el => {
+    if (el.textContent.includes('민준')) el.innerHTML = el.innerHTML.replace(/민준/g, name);
+  });
+  // mypage header 이름 div (font-size:20px)
+  document.querySelectorAll('#screen-mypage *').forEach(el => {
+    if (el.children.length === 0 && el.textContent.includes('민준')) {
+      el.textContent = el.textContent.replace(/민준/g, name);
+    }
+  });
+}
 
 /* ── 일기 데이터 (Supabase에서 불러옴) ── */
 const diaryMockData = {};
