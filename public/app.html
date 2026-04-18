@@ -4681,18 +4681,21 @@ function openFeedModal(i) {
   const d = feedData[i];
   const ems = getEmotions(d);
   // 다중 감정 도트
-  const emot = document.getElementById('modal-dot').parentElement;
+  const modalDotEl = document.getElementById('modal-dot');
+  const emot = modalDotEl ? modalDotEl.parentElement : null;
   if (emot) {
-    const timeEl = document.getElementById('modal-time');
     emot.innerHTML = `<div style="display:flex;gap:4px;align-items:center;">${buildDotsHTML(ems,9)}</div>
       <span class="feed-modal-ename">${ems.map(em=>em.e).join(' · ')}</span>
       <span class="feed-modal-time" id="modal-time"></span>`;
-    document.getElementById('modal-time').textContent = d.time;
-  } else {
-    document.getElementById('modal-dot').style.background = d.dot;
-    document.getElementById('modal-emotion').textContent = d.e;
+    const mt = document.getElementById('modal-time');
+    if (mt) mt.textContent = d.time;
+  } else if (modalDotEl) {
+    modalDotEl.style.background = d.dot;
+    const emoEl = document.getElementById('modal-emotion');
+    if (emoEl) emoEl.textContent = d.e;
   }
-  document.getElementById('modal-time').textContent = d.time;
+  const modalTimeEl = document.getElementById('modal-time');
+  if (modalTimeEl) modalTimeEl.textContent = d.time;
   document.getElementById('modal-title').textContent = d.title;
   document.getElementById('modal-body').textContent = d.body;
   document.getElementById('modal-photos').innerHTML = buildFeedPhotoHTML(d.imgs, 'modal-photos');
