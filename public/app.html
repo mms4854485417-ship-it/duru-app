@@ -4635,8 +4635,9 @@ const _EMOTION_DOT = {'기쁨':'#F4D03F','우울':'#5D8AA8','평온':'#85C1E9','
 async function loadMonthDiariesFromSupabase(year, month) {
   const { data: { user } } = await _sb.auth.getUser();
   if (!user) return {};
-  const from = `${year}-${String(month).padStart(2,'0')}-01`;
-  const to   = `${year}-${String(month).padStart(2,'0')}-31`;
+  const from    = `${year}-${String(month).padStart(2,'0')}-01`;
+  const lastDay = new Date(year, month, 0).getDate();
+  const to      = `${year}-${String(month).padStart(2,'0')}-${String(lastDay).padStart(2,'0')}`;
   const { data, error } = await _sb.from('diaries').select('*').eq('user_id', user.id).gte('date', from).lte('date', to);
   if (error) { console.error('loadMonthDiaries error:', error); return {}; }
   if (!data) return {};
