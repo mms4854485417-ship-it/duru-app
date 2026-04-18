@@ -1347,7 +1347,10 @@ async function signOut() {
             </div>
             <div id="cal-entry-title" class="cal-entry-title"></div>
             <div id="cal-entry-body" class="cal-entry-body"></div>
-            <button class="cal-entry-btn" onclick="closeCalEntry()">닫기</button>
+            <div style="display:flex;gap:8px;margin-top:4px;">
+              <button class="cal-entry-btn" onclick="closeCalEntry()" style="flex:1;">닫기</button>
+              <button onclick="deleteDiaryEntry()" style="flex:1;padding:13px;border-radius:14px;border:none;background:#FFF0F0;color:#C0392B;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">삭제</button>
+            </div>
           </div>
         </div>
       </div>
@@ -4620,12 +4623,14 @@ let calYear  = AppState.cal.year;
 let calMonth = AppState.cal.month;
 
 /* ── 캘린더 날짜 탭 → 일기 미니 모달 ── */
+let _calEntryDateStr = null;
+
 function openCalEntry(dateStr) {
   const entry = diaryMockData[dateStr];
   if (!entry) return;
+  _calEntryDateStr = dateStr;
   const [y, m, d] = dateStr.split('-');
   const ems = getEmotions(entry);
-  // 다중 감정 도트를 cal-entry-tag에 반영
   const tag = document.querySelector('.cal-entry-tag');
   if (tag) {
     tag.innerHTML = `
@@ -4637,9 +4642,24 @@ function openCalEntry(dateStr) {
   document.getElementById('cal-entry-body').textContent = entry.body || '';
   document.getElementById('cal-entry-modal').classList.add('show');
 }
+
 function closeCalEntry(e) {
   if (e && e.target !== document.getElementById('cal-entry-modal') && !e.target.closest('.cal-entry-btn')) return;
   document.getElementById('cal-entry-modal').classList.remove('show');
+}
+
+async function deleteDiaryEntry() {
+  if (!_calEntryDateStr) return;
+  if (!confirm('이 일기를 삭제할까요?')) return;
+  const dateStr = _calEntryDateStr;
+  // Supabase에서 삭제
+  await _sb.from('diaries').delete().eq('user_id', window._sbUser.id).eq('date', dateStr);
+  // 로컬 데이터에서도 삭제
+  delete diaryMockData[dateStr];
+  // 모달 닫기 & 달력 갱신
+  document.getElementById('cal-entry-modal').classList.remove('show');
+  renderCalendar();
+  renderMonthlyStats();
 }
 
 /* ── 주간 스트립 감정 툴팁 ── */
