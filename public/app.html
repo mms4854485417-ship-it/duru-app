@@ -1304,38 +1304,28 @@ async function signOut() {
   <div style="font-size:11px;font-weight:700;color:#999;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;" id="record-month-label2">이번 달의 마음</div>
   <div style="background:linear-gradient(135deg,#EBF3FA 0%,#E0EDF7 100%);border-radius:20px;padding:18px;margin-bottom:10px;border:1px solid rgba(93,138,168,.15);">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-      <div style="font-size:11px;font-weight:700;color:#5D8AA8;letter-spacing:.04em;">민준님의 마음 색깔</div>
+      <div style="font-size:11px;font-weight:700;color:#5D8AA8;letter-spacing:.04em;" id="mood-card-name">나의 마음 색깔</div>
       <span style="font-size:10px;color:#88AAC0;background:rgba(93,138,168,.12);padding:3px 8px;border-radius:8px;font-weight:600;" id="cal-entry-count-badge">0일 기록</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
-      <div style="width:10px;height:10px;border-radius:50%;background:#5D8AA8;flex-shrink:0;"></div>
-      <span style="font-size:20px;font-weight:900;color:#2C5F7A;">우울</span>
+      <div style="width:10px;height:10px;border-radius:50%;flex-shrink:0;" id="mood-card-dot"></div>
+      <span style="font-size:20px;font-weight:900;color:#2C5F7A;" id="mood-card-emotion">—</span>
       <span style="font-size:12px;color:#88AAC0;margin-left:auto;">가장 자주 마주한 마음</span>
     </div>
-    <div style="background:rgba(255,255,255,.65);border-radius:12px;padding:10px 12px;font-size:12px;color:#5D7A8A;line-height:1.55;font-weight:500;">
-      💬 우울한 날이 많았지만, 그만큼 솔직하게 기록하셨네요. 기록하는 것 자체가 용기예요.
+    <div style="background:rgba(255,255,255,.65);border-radius:12px;padding:10px 12px;font-size:12px;color:#5D7A8A;line-height:1.55;font-weight:500;" id="mood-card-comment">
+      💬 일기를 쓰기 시작했어요. 계속 기록해보세요!
     </div>
   </div>
 
   <!-- 도넛 차트 -->
   <div style="background:white;border-radius:20px;padding:18px;margin-bottom:12px;border:1px solid rgba(0,0,0,.06);">
     <div style="font-size:13px;font-weight:800;color:#111109;margin-bottom:14px;">감정 분포</div>
-    <div style="display:flex;align-items:center;gap:20px;">
+    <div id="emotion-chart-wrap" style="display:flex;align-items:center;gap:20px;">
       <svg width="110" height="110" viewBox="0 0 110 110" style="flex-shrink:0;">
         <circle cx="55" cy="55" r="40" fill="none" stroke="#EEE8E0" stroke-width="14"/>
-        <circle cx="55" cy="55" r="40" fill="none" stroke="#5D8AA8" stroke-width="14" stroke-dasharray="95.5 155.8" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 55 55)"/>
-        <circle cx="55" cy="55" r="40" fill="none" stroke="#7F8C8D" stroke-width="14" stroke-dasharray="65.3 186" stroke-dashoffset="-95.5" stroke-linecap="round" transform="rotate(-90 55 55)"/>
-        <circle cx="55" cy="55" r="40" fill="none" stroke="#85C1E9" stroke-width="14" stroke-dasharray="50.3 201" stroke-dashoffset="-160.8" stroke-linecap="round" transform="rotate(-90 55 55)"/>
-        <circle cx="55" cy="55" r="40" fill="none" stroke="#F4D03F" stroke-width="14" stroke-dasharray="40.2 211.1" stroke-dashoffset="-211.1" stroke-linecap="round" transform="rotate(-90 55 55)"/>
-        <text x="55" y="51" text-anchor="middle" font-size="12" font-weight="800" fill="#2C5F7A" font-family="Pretendard,sans-serif">우울</text>
-        <text x="55" y="64" text-anchor="middle" font-size="10" fill="#88AAC0" font-family="Pretendard,sans-serif">38%</text>
+        <text x="55" y="58" text-anchor="middle" font-size="11" fill="#BBB" font-family="Pretendard,sans-serif">기록 없음</text>
       </svg>
-      <div style="display:flex;flex-direction:column;gap:8px;flex:1;">
-        <div style="display:flex;align-items:center;gap:8px;"><div style="width:8px;height:8px;border-radius:50%;background:#5D8AA8;flex-shrink:0;"></div><span style="font-size:12px;color:#444;font-weight:600;flex:1;">우울</span><span style="font-size:11px;color:#888;">38%</span></div>
-        <div style="display:flex;align-items:center;gap:8px;"><div style="width:8px;height:8px;border-radius:50%;background:#7F8C8D;flex-shrink:0;"></div><span style="font-size:12px;color:#444;font-weight:600;flex:1;">외로움</span><span style="font-size:11px;color:#888;">26%</span></div>
-        <div style="display:flex;align-items:center;gap:8px;"><div style="width:8px;height:8px;border-radius:50%;background:#85C1E9;flex-shrink:0;"></div><span style="font-size:12px;color:#444;font-weight:600;flex:1;">평온</span><span style="font-size:11px;color:#888;">20%</span></div>
-        <div style="display:flex;align-items:center;gap:8px;"><div style="width:8px;height:8px;border-radius:50%;background:#F4D03F;flex-shrink:0;"></div><span style="font-size:12px;color:#444;font-weight:600;flex:1;">기쁨</span><span style="font-size:11px;color:#888;">16%</span></div>
-      </div>
+      <div style="font-size:12px;color:#BBB;">이번 달 일기를 써보세요</div>
     </div>
   </div>
 
@@ -4817,6 +4807,79 @@ function renderCalendar() {
   const countLabel = document.getElementById('cal-count-label');
   if (countLabel) countLabel.textContent = `${monthNames[calMonth]}에 ${entryCount}일 기록했어요`;
   renderRecentDiaries();
+  renderMonthlyStats();
+}
+
+function renderMonthlyStats() {
+  const entries = Object.entries(diaryMockData).filter(([k]) =>
+    k.startsWith(`${calYear}-${String(calMonth+1).padStart(2,'0')}`)
+  );
+  if (!entries.length) {
+    const dot = document.getElementById('mood-card-dot');
+    const em  = document.getElementById('mood-card-emotion');
+    const cmt = document.getElementById('mood-card-comment');
+    if (dot) dot.style.background = '#CCC';
+    if (em)  em.textContent = '—';
+    if (cmt) cmt.textContent = '💬 이번 달 일기를 써보세요!';
+    const wrap = document.getElementById('emotion-chart-wrap');
+    if (wrap) wrap.innerHTML = `<svg width="110" height="110" viewBox="0 0 110 110" style="flex-shrink:0;"><circle cx="55" cy="55" r="40" fill="none" stroke="#EEE8E0" stroke-width="14"/><text x="55" y="58" text-anchor="middle" font-size="11" fill="#BBB" font-family="Pretendard,sans-serif">기록 없음</text></svg><div style="font-size:12px;color:#BBB;">이번 달 일기를 써보세요</div>`;
+    return;
+  }
+
+  // 감정 카운트
+  const emotionCount = {};
+  entries.forEach(([, entry]) => {
+    const ems = getEmotions(entry);
+    ems.forEach(em => { emotionCount[em.e] = (emotionCount[em.e] || 0) + 1; });
+  });
+  const sorted = Object.entries(emotionCount).sort((a,b) => b[1]-a[1]);
+  const topEmotion = sorted[0]?.[0] || '';
+  const topDot = _EMOTION_DOT[topEmotion] || '#888';
+
+  // 이번 달의 마음 카드 업데이트
+  const dot = document.getElementById('mood-card-dot');
+  const em  = document.getElementById('mood-card-emotion');
+  const cmt = document.getElementById('mood-card-comment');
+  if (dot) dot.style.background = topDot;
+  if (em)  em.textContent = topEmotion || '—';
+  const comments = {
+    '기쁨': '💬 기쁜 날이 많았어요. 그 감정을 잘 기억해두세요!',
+    '평온': '💬 평온한 하루들이 많았네요. 좋은 흐름이에요.',
+    '우울': '💬 우울한 날이 있었지만, 기록한 것 자체가 용기예요.',
+    '슬픔': '💬 슬픈 감정도 충분히 느껴도 괜찮아요.',
+    '외로움': '💬 외로움을 솔직하게 적었네요. 잘하고 있어요.',
+    '불안': '💬 불안한 마음을 기록하며 조금씩 정리해봐요.',
+    '분노': '💬 화가 났던 날, 기록으로 풀어낼 수 있어요.',
+    '설렘': '💬 설레는 감정이 가득한 달이었네요!',
+    '공허함': '💬 공허한 날도 기록하며 채워가고 있어요.',
+  };
+  if (cmt) cmt.textContent = comments[topEmotion] || '💬 이번 달도 잘 기록하고 있어요!';
+
+  // 도넛 차트 업데이트
+  const total = sorted.reduce((s,[,c]) => s+c, 0);
+  const circ = 2 * Math.PI * 40; // ≈ 251.3
+  let offset = 0;
+  const circles = sorted.slice(0,4).map(([e, c]) => {
+    const pct = c / total;
+    const dash = pct * circ;
+    const svg = `<circle cx="55" cy="55" r="40" fill="none" stroke="${_EMOTION_DOT[e]||'#888'}" stroke-width="14" stroke-dasharray="${dash.toFixed(1)} ${(circ-dash).toFixed(1)}" stroke-dashoffset="${(-offset).toFixed(1)}" stroke-linecap="round" transform="rotate(-90 55 55)"/>`;
+    offset += dash;
+    return svg;
+  }).join('');
+  const legend = sorted.slice(0,4).map(([e, c]) => {
+    const pct = Math.round(c/total*100);
+    return `<div style="display:flex;align-items:center;gap:8px;"><div style="width:8px;height:8px;border-radius:50%;background:${_EMOTION_DOT[e]||'#888'};flex-shrink:0;"></div><span style="font-size:12px;color:#444;font-weight:600;flex:1;">${e}</span><span style="font-size:11px;color:#888;">${pct}%</span></div>`;
+  }).join('');
+
+  const wrap = document.getElementById('emotion-chart-wrap');
+  if (wrap) wrap.innerHTML = `
+    <svg width="110" height="110" viewBox="0 0 110 110" style="flex-shrink:0;">
+      <circle cx="55" cy="55" r="40" fill="none" stroke="#EEE8E0" stroke-width="14"/>
+      ${circles}
+      <text x="55" y="51" text-anchor="middle" font-size="12" font-weight="800" fill="#2C5F7A" font-family="Pretendard,sans-serif">${topEmotion}</text>
+      <text x="55" y="64" text-anchor="middle" font-size="10" fill="#88AAC0" font-family="Pretendard,sans-serif">${Math.round((sorted[0]?.[1]||0)/total*100)}%</text>
+    </svg>
+    <div style="display:flex;flex-direction:column;gap:8px;flex:1;">${legend}</div>`;
 }
 
 function changeMonth(delta) {
