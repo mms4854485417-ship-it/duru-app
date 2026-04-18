@@ -1064,10 +1064,10 @@ const _sb = supabase.createClient(
 })();
 
 // 일기 저장
-async function saveDiaryToSupabase(date, content, emotion, isPublic = false) {
+async function saveDiaryToSupabase(date, content, emotion, isPublic = false, saveType = 'private') {
   if (!window._sbUser) return;
   await _sb.from('diaries').upsert(
-    { user_id: window._sbUser.id, date, content: content || '', emotion: emotion || '', is_public: isPublic, updated_at: new Date().toISOString() },
+    { user_id: window._sbUser.id, date, content: content || '', emotion: emotion || '', is_public: isPublic, save_type: saveType, updated_at: new Date().toISOString() },
     { onConflict: 'user_id,date' }
   );
 }
@@ -1077,6 +1077,122 @@ async function loadDiaryFromSupabase(date) {
   if (!window._sbUser) return null;
   const { data } = await _sb.from('diaries').select('*').eq('date', date).maybeSingle();
   return data;
+}
+
+// 어제 일기 불러오기
+async function loadYesterdayDiary() {
+  const { data: { user } } = await _sb.auth.getUser();
+  if (!user) return null;
+  const yest = new Date(); yest.setDate(yest.getDate() - 1);
+  const yStr = `${yest.getFullYear()}-${String(yest.getMonth()+1).padStart(2,'0')}-${String(yest.getDate()).padStart(2,'0')}`;
+  const { data } = await _sb.from('diaries').select('*').eq('user_id', user.id).eq('date', yStr).maybeSingle();
+  return data ? { ...data, dateStr: yStr } : null;
+}
+
+// 날려보낸 일기 불러오기
+async function loadReleasedDiaries() {
+  const { data: { user } } = await _sb.auth.getUser();
+  if (!user) return [];
+  const { data, error } = await _sb.from('diaries').select('*')
+    .eq('user_id', user.id).eq('save_type', 'released').order('date', { ascending: false });
+  if (error || !data) return [];
+  return data.map(row => {
+    const parts = (row.content || '').split('\n\n');
+    const d = new Date(row.date);
+    const dateLabel = `${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+    return {
+      e:    (row.emotion || '').split(', ')[0],
+      dot:  _EMOTION_DOT[(row.emotion || '').split(', ')[0]] || '#888',
+      title: parts[0] || '제목 없음',
+      body:  parts.slice(1).join('\n\n') || '',
+      date:  dateLabel,
+      id:    row.id,
+    };
+  });
+}
+
+// 홈 화면 데이터 초기화 (어제 일기 + 유저 이름)
+async function initHomeData() {
+  // ① 유저 이름 Supabase에서 로드
+  try {
+    const { data: { user } } = await _sb.auth.getUser();
+    if (user) {
+      const metaName = user.user_metadata?.display_name;
+      const localName = localStorage.getItem('duru_user_name');
+      const name = metaName || localName;
+      if (name && name !== '민준') {
+        applyUserName(name);
+        if (!localName) localStorage.setItem('duru_user_name', name);
+      }
+    }
+  } catch(e) {}
+
+  // ② 어제 일기 로드 → 카드 + 모달 업데이트
+  try {
+    const entry = await loadYesterdayDiary();
+    updateYesterdayCard(entry);
+  } catch(e) {}
+}
+
+// 어제 일기 카드 UI 업데이트
+function updateYesterdayCard(entry) {
+  const card = document.querySelector('.duru-comment-card');
+  if (!card) return;
+
+  if (!entry) {
+    // 어제 일기 없음 → 기본 두루 코멘트만 보여줌
+    const msg = document.getElementById('duru-comment-msg');
+    if (msg) msg.innerHTML = '어제 기록이 없네요. 오늘은 꼭 써봐요 :)';
+    const label = document.getElementById('duru-comment-label');
+    if (label) label.textContent = '두루의 한마디';
+    card.onclick = null;
+    card.style.cursor = 'default';
+    return;
+  }
+
+  // 어제 일기 있음 → 내용 반영
+  const parts = (entry.content || '').split('\n\n');
+  const title = parts[0] || '어제의 기록';
+  const emotion = (entry.emotion || '').split(', ')[0];
+  const dot = _EMOTION_DOT[emotion] || '#888';
+  const days = ['일','월','화','수','목','금','토'];
+  const d = new Date(entry.dateStr);
+  const dateLabel = `${d.getMonth()+1}월 ${d.getDate()}일 ${days[d.getDay()]}요일`;
+
+  const label = document.getElementById('duru-comment-label');
+  if (label) label.textContent = `두루의 한마디 · 어제 기록`;
+
+  const msgEl = document.getElementById('duru-comment-msg');
+  if (msgEl) {
+    const commentMap = {
+      '기쁨':   `어제 기쁜 일이 있었군요!<br>${title}`,
+      '우울':   `어제는 좀 무거웠겠네요.<br>오늘은 조금 나아졌으면 해요.`,
+      '평온':   `어제는 평온한 하루였군요.<br>${title}`,
+      '외로움': `어제는 좀 외롭다고 했는데,<br>오늘은 기분이 좀 나아졌을까요?`,
+      '불안':   `어제 걱정이 많았던 것 같아요.<br>오늘은 조금 더 가벼웠으면 해요.`,
+      '슬픔':   `어제는 마음이 힘들었겠어요.<br>오늘도 두루가 여기 있어요.`,
+      '분노':   `어제 화가 났던 일이 있었군요.<br>오늘은 조금 풀렸으면 해요.`,
+      '설렘':   `어제 설레는 일이 있었군요!<br>${title}`,
+      '화남':   `어제 화가 많이 났겠어요.<br>오늘은 좀 나아졌으면 해요.`,
+      '공허함': `어제는 공허했던 것 같아요.<br>오늘 조금이라도 채워졌으면 해요.`,
+    };
+    msgEl.innerHTML = commentMap[emotion] || `어제의 기록이 있어요.<br>${title}`;
+  }
+
+  // 모달 미리 채워두기
+  const dotEl = document.querySelector('.yesterday-modal-dot');
+  if (dotEl) dotEl.style.background = dot;
+  const emoEl = document.querySelector('.yesterday-modal-emotion');
+  if (emoEl) emoEl.textContent = emotion || '';
+  const dateEl = document.querySelector('.yesterday-modal-date');
+  if (dateEl) dateEl.textContent = dateLabel;
+  const titleEl = document.querySelector('.yesterday-modal-title');
+  if (titleEl) titleEl.textContent = title;
+  const bodyEl = document.querySelector('.yesterday-modal-body');
+  if (bodyEl) bodyEl.innerHTML = (parts.slice(1).join('\n\n') || '').replace(/\n/g, '<br>');
+
+  card.onclick = () => document.getElementById('yesterday-modal-bg').classList.add('show');
+  card.style.cursor = 'pointer';
 }
 
 // 로그아웃
@@ -3052,6 +3168,7 @@ function goTo(id) {
   });
 
   if (id === 'screen-release') initRelease();
+  if (id === 'screen-home') initHomeData();
   if (id === 'screen-feed') initFeed();
   if (id === 'screen-record') {
     const monthPrefix = `${calYear}-${String(calMonth+1).padStart(2,'0')}`;
@@ -3535,7 +3652,8 @@ function handleSave() {
     document.getElementById('release-confirm-bg').classList.add('show');
   } else {
     const isPublic = sel?.dataset?.s === '공유';
-    saveDiaryToSupabase(_getDiaryDateStr(), _getDiaryContent(), _getDiaryEmotion(), isPublic).catch(console.error);
+    const saveType = isPublic ? 'public' : 'private';
+    saveDiaryToSupabase(_getDiaryDateStr(), _getDiaryContent(), _getDiaryEmotion(), isPublic, saveType).catch(console.error);
     playCelebMotion();
     setTimeout(()=>goTo('screen-home'), 2200);
   }
@@ -3552,7 +3670,7 @@ function confirmRelease() {
   const body  = document.querySelector('.write-body-input')?.value || '';
   const now   = new Date();
   const date  = `${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
-  saveDiaryToSupabase(_getDiaryDateStr(), _getDiaryContent(), _getDiaryEmotion()).catch(console.error);
+  saveDiaryToSupabase(_getDiaryDateStr(), _getDiaryContent(), _getDiaryEmotion(), false, 'released').catch(console.error);
   releasedData.unshift({e:eName, dot, title, body, date});
   goTo('screen-release');
 }
@@ -3705,7 +3823,9 @@ const releasedData = [
 let curReleasedIdx = null;
 
 async function loadMypageStats() {
-  const { data } = await _sb.from('diaries').select('date').eq('user_id', window._sbUser?.id || '').order('date');
+  const { data: { user } } = await _sb.auth.getUser();
+  if (!user) return;
+  const { data } = await _sb.from('diaries').select('date').eq('user_id', user.id).order('date');
   if (!data || !data.length) {
     ['stat-total','stat-streak','stat-longest'].forEach(id => {
       const el = document.getElementById(id);
@@ -3748,8 +3868,14 @@ function renderReleased() {
   if (countEl) countEl.textContent = releasedData.length;
 }
 
-function openReleasedVault() {
+async function openReleasedVault() {
+  // Supabase에서 날려보낸 일기 로드
+  const freshData = await loadReleasedDiaries();
+  // 로컬 캐시 갱신
+  releasedData.length = 0;
+  freshData.forEach(d => releasedData.push(d));
   renderReleased();
+
   const sub = document.getElementById('vault-subtitle');
   if (sub) sub.textContent = releasedData.length ? `총 ${releasedData.length}개의 일기` : '아직 날려보낸 일기가 없어요';
   const list = document.getElementById('released-vault-list');
@@ -4845,6 +4971,11 @@ window.addEventListener('load', ()=>{
   if (_savedName) {
     setTimeout(() => applyUserName(_savedName), 100);
   }
+
+  // 홈 데이터 초기 로드 (어제 일기 + 유저 이름 Supabase 동기화)
+  setTimeout(() => {
+    if (typeof initHomeData === 'function') initHomeData();
+  }, 600);
 });
 
 /* ══════════════════════════════
@@ -5055,8 +5186,10 @@ async function deleteDiaryEntry() {
   if (!_calEntryDateStr) return;
   if (!confirm('이 일기를 삭제할까요?')) return;
   const dateStr = _calEntryDateStr;
+  const { data: { user } } = await _sb.auth.getUser();
+  if (!user) return;
   // Supabase에서 삭제
-  await _sb.from('diaries').delete().eq('user_id', window._sbUser.id).eq('date', dateStr);
+  await _sb.from('diaries').delete().eq('user_id', user.id).eq('date', dateStr);
   // 로컬 데이터에서도 삭제
   delete diaryMockData[dateStr];
   // 모달 닫기 & 달력 갱신
