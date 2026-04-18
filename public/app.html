@@ -1013,10 +1013,10 @@ const _sb = supabase.createClient(
 })();
 
 // 일기 저장
-async function saveDiaryToSupabase(date, content, emotion) {
+async function saveDiaryToSupabase(date, content, emotion, isPublic = false) {
   if (!window._sbUser) return;
   await _sb.from('diaries').upsert(
-    { user_id: window._sbUser.id, date, content: content || '', emotion: emotion || '', updated_at: new Date().toISOString() },
+    { user_id: window._sbUser.id, date, content: content || '', emotion: emotion || '', is_public: isPublic, updated_at: new Date().toISOString() },
     { onConflict: 'user_id,date' }
   );
 }
@@ -2850,7 +2850,11 @@ function goTo(id) {
 
   if (id === 'screen-release') initRelease();
   if (id === 'screen-feed') initFeed();
-  if (id === 'screen-record') renderCalendar();
+  if (id === 'screen-record') {
+    loadMonthDiariesFromSupabase(calYear, calMonth + 1)
+      .then(realData => { Object.assign(diaryMockData, realData); renderCalendar(); })
+      .catch(() => renderCalendar());
+  }
   if (id === 'screen-mypage') { renderReleased(); }
   if (id === 'screen-book') { initBookScreen(); }
   if (id === 'screen-emotion') {
@@ -3145,6 +3149,10 @@ function quickSaveDiary() {
     .then(() => {
       if (btn) { btn.textContent = '저장됨 ✓'; btn.style.color = '#5A9870'; }
       setTimeout(() => { if (btn) { btn.textContent = '저장'; btn.style.color = '#9A9490'; } }, 2000);
+      // 달력 데이터 갱신
+      const now = new Date();
+      loadMonthDiariesFromSupabase(now.getFullYear(), now.getMonth()+1)
+        .then(d => Object.assign(diaryMockData, d)).catch(()=>{});
     })
     .catch(() => {
       if (btn) { btn.textContent = '오류'; btn.style.color = '#C0392B'; }
@@ -3321,7 +3329,8 @@ function handleSave() {
   if (sel && sel.dataset.s === '날려보내기') {
     document.getElementById('release-confirm-bg').classList.add('show');
   } else {
-    saveDiaryToSupabase(_getDiaryDateStr(), _getDiaryContent(), _getDiaryEmotion()).catch(console.error);
+    const isPublic = sel?.dataset?.s === '공유';
+    saveDiaryToSupabase(_getDiaryDateStr(), _getDiaryContent(), _getDiaryEmotion(), isPublic).catch(console.error);
     playCelebMotion();
     setTimeout(()=>goTo('screen-home'), 2200);
   }
@@ -4344,7 +4353,41 @@ function toggleModalLike() {
   renderFeed();
 }
 
-function initFeed() { renderFeed(); }
+async function initFeed() {
+  const { data } = await _sb.from('diaries')
+    .select('*')
+    .eq('is_public', true)
+    .order('updated_at', { ascending: false })
+    .limit(50);
+
+  if (data && data.length > 0) {
+    const realFeed = data.map(row => {
+      const emotionNames = (row.emotion || '').split(', ').filter(Boolean);
+      const emotions = emotionNames.map(e => ({ e, dot: _EMOTION_DOT[e] || '#888' }));
+      const parts = (row.content || '').split('\n\n');
+      return {
+        e:      emotions[0]?.e   || '',
+        dot:    emotions[0]?.dot || '#888',
+        emotions,
+        title:  parts[0] || '제목 없음',
+        body:   parts.slice(1).join('\n\n') || '',
+        time:   formatRelativeTime(row.updated_at),
+        likes:  0,
+      };
+    });
+    feedData.length = 0;
+    realFeed.forEach(d => feedData.push(d));
+  }
+  renderFeed();
+}
+
+function formatRelativeTime(iso) {
+  const diff = Math.floor((Date.now() - new Date(iso)) / 1000);
+  if (diff < 60)   return '방금 전';
+  if (diff < 3600) return `${Math.floor(diff/60)}분 전`;
+  if (diff < 86400)return `${Math.floor(diff/3600)}시간 전`;
+  return `${Math.floor(diff/86400)}일 전`;
+}
 
 // 초기 피드 렌더링
 initFeed();
@@ -4583,6 +4626,31 @@ const diaryMockData = {
   '2026-03-02':{e:'평온',dot:'#85C1E9',title:'비 오는 일요일, 아무 계획 없음',body:'그냥 집에서 넷플릭스 봤다. 아무것도 안 해도 되는 날이 이렇게 귀할 줄이야.'},
   '2026-03-01':{e:'우울',dot:'#5D8AA8',title:'3월 첫 날부터 왜 이러나',body:'아침부터 기분이 가라앉았다. 날이 흐린 탓인가.'},
 };
+
+/* ── Supabase → diaryMockData 형식 변환 ── */
+const _EMOTION_DOT = {'기쁨':'#F4D03F','우울':'#5D8AA8','평온':'#85C1E9','외로움':'#7F8C8D','불안':'#95A5A6','슬픔':'#AEB6BF','분노':'#C0392B','설렘':'#F1948A','화남':'#C0392B','공허함':'#BDC3C7'};
+
+async function loadMonthDiariesFromSupabase(year, month) {
+  if (!window._sbUser) return {};
+  const from = `${year}-${String(month).padStart(2,'0')}-01`;
+  const to   = `${year}-${String(month).padStart(2,'0')}-31`;
+  const { data } = await _sb.from('diaries').select('*').gte('date', from).lte('date', to);
+  if (!data) return {};
+  const result = {};
+  data.forEach(row => {
+    const emotionNames = (row.emotion || '').split(', ').filter(Boolean);
+    const emotions = emotionNames.map(e => ({ e, dot: _EMOTION_DOT[e] || '#888' }));
+    const parts = (row.content || '').split('\n\n');
+    result[row.date] = {
+      e:      emotions[0]?.e  || '',
+      dot:    emotions[0]?.dot || '#888',
+      emotions,
+      title:  parts[0] || '',
+      body:   parts.slice(1).join('\n\n') || '',
+    };
+  });
+  return result;
+}
 
 /* ── 앱 상태 객체 ── */
 const AppState = {
