@@ -2853,6 +2853,19 @@ function goTo(id) {
   if (id === 'screen-emotion') {
     setTimeout(resetEmoDuru, 100);
   }
+  if (id === 'screen-write') {
+    loadDiaryFromSupabase(_getDiaryDateStr()).then(data => {
+      if (!data) return;
+      const titleEl = document.querySelector('.write-title-input');
+      const bodyEl  = document.querySelector('.write-body-input');
+      if (!titleEl || !bodyEl) return;
+      if (data.content) {
+        const parts = data.content.split('\n\n');
+        titleEl.value = parts[0] || '';
+        bodyEl.value  = parts.slice(1).join('\n\n') || '';
+      }
+    }).catch(() => {});
+  }
 }
 
 /* ── 사진 첨부 (모자이크 그리드) ── */
