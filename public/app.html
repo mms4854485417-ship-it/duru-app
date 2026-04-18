@@ -2851,6 +2851,8 @@ function goTo(id) {
   if (id === 'screen-release') initRelease();
   if (id === 'screen-feed') initFeed();
   if (id === 'screen-record') {
+    const monthPrefix = `${calYear}-${String(calMonth+1).padStart(2,'0')}`;
+    Object.keys(diaryMockData).filter(k => k.startsWith(monthPrefix)).forEach(k => delete diaryMockData[k]);
     loadMonthDiariesFromSupabase(calYear, calMonth + 1)
       .then(realData => { Object.assign(diaryMockData, realData); renderCalendar(); })
       .catch(() => renderCalendar());
