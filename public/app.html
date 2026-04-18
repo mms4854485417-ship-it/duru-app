@@ -1426,17 +1426,17 @@ async function signOut() {
           <!-- 통계 3칸 -->
           <div style="display:flex;margin-top:20px;padding-top:18px;border-top:1px solid rgba(0,0,0,.06);">
             <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
-              <span style="font-size:22px;font-weight:900;color:#1A1A14;line-height:1;">47</span>
+              <span id="stat-total" style="font-size:22px;font-weight:900;color:#1A1A14;line-height:1;">—</span>
               <span style="font-size:11px;color:#BBBBBB;font-weight:600;">총 일기</span>
             </div>
             <div style="width:1px;background:rgba(0,0,0,.07);margin:0 4px;"></div>
             <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
-              <span style="font-size:22px;font-weight:900;color:#FF6B35;line-height:1;">7일</span>
+              <span id="stat-streak" style="font-size:22px;font-weight:900;color:#FF6B35;line-height:1;">—</span>
               <span style="font-size:11px;color:#BBBBBB;font-weight:600;">현재 연속</span>
             </div>
             <div style="width:1px;background:rgba(0,0,0,.07);margin:0 4px;"></div>
             <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
-              <span style="font-size:22px;font-weight:900;color:#1A1A14;line-height:1;">14일</span>
+              <span id="stat-longest" style="font-size:22px;font-weight:900;color:#1A1A14;line-height:1;">—</span>
               <span style="font-size:11px;color:#BBBBBB;font-weight:600;">최장 기록</span>
             </div>
           </div>
@@ -2850,7 +2850,7 @@ function goTo(id) {
       .then(realData => { Object.assign(diaryMockData, realData); renderCalendar(); })
       .catch(() => renderCalendar());
   }
-  if (id === 'screen-mypage') { renderReleased(); }
+  if (id === 'screen-mypage') { renderReleased(); loadMypageStats(); }
   if (id === 'screen-book') { initBookScreen(); }
   if (id === 'screen-emotion') {
     setTimeout(resetEmoDuru, 100);
@@ -3493,6 +3493,45 @@ const releasedData = [
   {e:'불안', dot:'#95A5A6', title:'내일 발표가 너무 무서웠다', body:'준비는 다 했는데 막상 앞에 서면 머릿속이 하얘질 것 같다. 그냥 다 내려놓고 자고 싶다.', date:'03.15'},
 ];
 let curReleasedIdx = null;
+
+async function loadMypageStats() {
+  const { data } = await _sb.from('diaries').select('date').eq('user_id', window._sbUser?.id || '').order('date');
+  if (!data || !data.length) {
+    ['stat-total','stat-streak','stat-longest'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '0';
+    });
+    return;
+  }
+  // 총 일기
+  const total = data.length;
+  // 날짜 목록
+  const dates = data.map(r => r.date).sort();
+  // 현재 연속 & 최장 기록 계산
+  const today = new Date(); today.setHours(0,0,0,0);
+  let streak = 0, longest = 0, cur = 0;
+  let prev = null;
+  for (const d of dates) {
+    const curr = new Date(d); curr.setHours(0,0,0,0);
+    if (prev) {
+      const diff = (curr - prev) / 86400000;
+      cur = diff === 1 ? cur + 1 : 1;
+    } else { cur = 1; }
+    longest = Math.max(longest, cur);
+    prev = curr;
+  }
+  // 현재 연속: 오늘 또는 어제까지 이어지면 유효
+  const lastDate = new Date(dates[dates.length-1]); lastDate.setHours(0,0,0,0);
+  const diffToday = (today - lastDate) / 86400000;
+  streak = diffToday <= 1 ? cur : 0;
+
+  const totalEl   = document.getElementById('stat-total');
+  const streakEl  = document.getElementById('stat-streak');
+  const longestEl = document.getElementById('stat-longest');
+  if (totalEl)   totalEl.textContent   = total;
+  if (streakEl)  streakEl.textContent  = streak ? `${streak}일` : '0일';
+  if (longestEl) longestEl.textContent = `${longest}일`;
+}
 
 function renderReleased() {
   const countEl = document.getElementById('released-count');
