@@ -3737,75 +3737,76 @@ function showSaveComplete(type) {
   const dots     = document.getElementById('save-complete-dots');
   if (!overlay) { setTimeout(()=>goTo('screen-home'), 400); return; }
 
-  /* ── 두루 기본 SVG (몸통 + 날개 + 얼굴) ── */
-  const duruBodySVG = (wingAnimL='', wingAnimR='', bodyAnim='', extraBadge='') => `
-    <svg width="160" height="180" viewBox="0 0 160 180" fill="none" xmlns="http://www.w3.org/2000/svg"
-         style="animation:saveDuruIn .45s cubic-bezier(.34,1.56,.64,1) both;">
-      <!-- 몸통 -->
-      <g style="${bodyAnim}">
-        <!-- 왼쪽 날개 -->
-        <g style="transform-origin:90px 105px;${wingAnimL}">
-          <ellipse cx="52" cy="118" rx="22" ry="13" fill="#E8F4F8" transform="rotate(-20 52 118)"/>
-        </g>
-        <!-- 오른쪽 날개 -->
-        <g style="transform-origin:70px 105px;${wingAnimR}">
-          <ellipse cx="108" cy="118" rx="22" ry="13" fill="#E8F4F8" transform="rotate(20 108 118)"/>
-        </g>
-        <!-- 몸통 원 -->
-        <ellipse cx="80" cy="115" rx="38" ry="42" fill="#F0F8FF"/>
-        <!-- 빨간 모자 -->
-        <ellipse cx="80" cy="76" rx="26" ry="8" fill="#C0392B"/>
-        <rect x="62" y="52" width="36" height="26" rx="16" fill="#C0392B"/>
-        <rect x="68" y="48" width="24" height="10" rx="5" fill="#A93226"/>
-        <!-- 얼굴(흰 동그라미) -->
-        <circle cx="80" cy="78" r="22" fill="white"/>
-        <!-- 눈 -->
-        <circle cx="74" cy="76" r="3.5" fill="#1A1A14"/>
-        <circle cx="86" cy="76" r="3.5" fill="#1A1A14"/>
-        <circle cx="75.2" cy="74.8" r="1.2" fill="white"/>
-        <circle cx="87.2" cy="74.8" r="1.2" fill="white"/>
-        <!-- 부리 -->
-        <path d="M77 82 Q80 86 83 82" stroke="#E67E22" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <!-- 볼터치 -->
-        <ellipse cx="70" cy="81" rx="5" ry="3" fill="#FADADD" opacity=".7"/>
-        <ellipse cx="90" cy="81" rx="5" ry="3" fill="#FADADD" opacity=".7"/>
-        <!-- 발 -->
-        <ellipse cx="70" cy="155" rx="9" ry="5" fill="#E67E22"/>
-        <ellipse cx="90" cy="155" rx="9" ry="5" fill="#E67E22"/>
+  /* ── 실제 두루 SVG (ai-duru-svg와 동일한 구조) ── */
+  const makeDuruSVG = (wlAnim='', wrAnim='', rootAnim='', badge='') => `
+    <svg width="154" height="185" viewBox="-8 -10 138 175" fill="none"
+         style="filter:drop-shadow(0 6px 14px rgba(0,0,0,.13));${rootAnim}">
+      <!-- 날개 왼 -->
+      <g style="transform-origin:20px 80px;${wlAnim}">
+        <path d="M20 70 Q3 59 1 74 Q3 93 20 83" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.2"/>
       </g>
-      ${extraBadge}
+      <!-- 날개 오른 -->
+      <g style="transform-origin:78px 80px;${wrAnim}">
+        <path d="M78 70 Q95 59 97 74 Q95 93 78 83" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.2"/>
+      </g>
+      <!-- 꼬리 -->
+      <path d="M37 116 Q33 132 43 138 Q53 142 63 136 Q69 128 65 116" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="1.8"/>
+      <!-- 몸통 -->
+      <ellipse cx="49" cy="92" rx="32" ry="27" fill="white" stroke="#1A1A14" stroke-width="2.2"/>
+      <!-- 다리 왼 -->
+      <path d="M33 116 L26 145" stroke="#1A1A14" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+      <path d="M17 145 Q26 143 32 148" stroke="#1A1A14" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <!-- 다리 오른 -->
+      <path d="M63 116 L72 145" stroke="#1A1A14" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+      <path d="M66 145 Q72 143 82 148" stroke="#1A1A14" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <!-- 목 -->
+      <path d="M46 66 Q43 54 46 42 Q48 32 51 21" stroke="#1A1A14" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <!-- 머리 -->
+      <ellipse cx="54" cy="15" rx="19" ry="18" fill="white" stroke="#1A1A14" stroke-width="2.1"/>
+      <!-- 정수리 빨간 크라운 -->
+      <ellipse cx="52" cy="5" rx="11" ry="7.5" fill="#C0392B"/>
+      <ellipse cx="50" cy="4" rx="7" ry="4.8" fill="#CC3A2A"/>
+      <ellipse cx="47" cy="2" rx="4.5" ry="2.5" fill="rgba(255,255,255,.28)" transform="rotate(-18 47 2)"/>
+      <!-- 눈 흰자 -->
+      <ellipse cx="44" cy="15" rx="7" ry="7.5" fill="white" stroke="#1A1A14" stroke-width="1.5"/>
+      <!-- 눈동자 -->
+      <ellipse cx="42" cy="15" rx="4.5" ry="5" fill="#1A1A14"/>
+      <circle cx="43.5" cy="13" r="1.6" fill="white"/>
+      <!-- 부리 -->
+      <path d="M68 13 L80 10 L68 20z" fill="#1A1A14" opacity=".9"/>
+      ${badge}
     </svg>`;
 
   if (type === 'private') {
-    /* 비공개 — 두루가 일기를 꼭 안아주는 느낌, gentle sway */
-    const bodyAnim = 'animation:saveDuruHug 1.6s ease-in-out .5s infinite;transform-origin:80px 115px;';
-    const lockBadge = `
-      <g style="animation:saveLockDrop .5s cubic-bezier(.34,1.56,.64,1) .55s both;">
-        <circle cx="118" cy="148" r="18" fill="#1A1A14"/>
-        <rect x="110" y="150" width="16" height="11" rx="3" fill="white"/>
-        <path d="M112 150v-3.5a6 6 0 0 1 12 0v3.5" stroke="white" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-        <circle cx="118" cy="156" r="2" fill="#1A1A14"/>
-        <line x1="118" y1="156" x2="118" y2="159" stroke="#1A1A14" stroke-width="1.6" stroke-linecap="round"/>
+    /* 비공개 — 두루가 포근하게 흔들리며 일기를 품어주는 느낌 */
+    const rootAnim = 'animation:saveDuruIn .42s cubic-bezier(.34,1.56,.64,1) both,saveDuruHug 2s ease-in-out .6s infinite;transform-origin:49px 100px;';
+    const badge = `
+      <g style="animation:saveLockDrop .5s cubic-bezier(.34,1.56,.64,1) .6s both;">
+        <circle cx="95" cy="138" r="16" fill="#1A1A14"/>
+        <rect x="88" y="139" width="14" height="10" rx="2.5" fill="white"/>
+        <path d="M90 139v-3a5 5 0 0 1 10 0v3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <circle cx="95" cy="144" r="1.8" fill="#1A1A14"/>
+        <line x1="95" y1="144" x2="95" y2="147" stroke="#1A1A14" stroke-width="1.5" stroke-linecap="round"/>
       </g>`;
-    duruEl.innerHTML = duruBodySVG('', '', bodyAnim, lockBadge);
+    duruEl.innerHTML = makeDuruSVG('', '', rootAnim, badge);
     title.innerHTML = '오늘 하루를<br>나만의 공간에 담았어요';
     desc.textContent = '아무도 볼 수 없는, 오직 나만의 기록이에요.';
     dots.innerHTML = ['#F4D03F','#85C1E9','#F1948A'].map((c,i)=>
       `<div class="save-complete-dot" style="background:${c};animation:saveDotPop .4s ease ${.3+i*.12}s both;"></div>`
     ).join('');
   } else {
-    /* 공유 — 두루가 신나서 점프 + 날개 펄럭 */
-    const bodyAnim = 'animation:saveDuruJump .7s cubic-bezier(.34,1.56,.64,1) .3s 2;transform-origin:80px 155px;';
-    const wingAnimL = 'animation:saveWingFlap .35s ease-in-out .3s 4;';
-    const wingAnimR = 'animation:saveWingFlap .35s ease-in-out .38s 4;';
-    const shareBadge = `
-      <g style="animation:saveShareRise .5s cubic-bezier(.34,1.56,.64,1) .4s both;">
-        <circle cx="118" cy="148" r="18" fill="#C0392B"/>
-        <line x1="118" y1="141" x2="118" y2="153" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
-        <path d="M112 147 L118 141 L124 147" stroke="white" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M112 156 Q118 153 124 156" stroke="white" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".7"/>
+    /* 공유 — 두루가 신나서 점프하고 날개를 펄럭 */
+    const rootAnim = 'animation:saveDuruIn .42s cubic-bezier(.34,1.56,.64,1) both,saveDuruJump .65s cubic-bezier(.34,1.56,.64,1) .5s 2;transform-origin:49px 148px;';
+    const wlAnim = 'animation:saveWingFlap .32s ease-in-out .5s 5;';
+    const wrAnim = 'animation:saveWingFlap .32s ease-in-out .56s 5;';
+    const badge = `
+      <g style="animation:saveShareRise .45s cubic-bezier(.34,1.56,.64,1) .45s both;">
+        <circle cx="95" cy="138" r="16" fill="#C0392B"/>
+        <line x1="95" y1="131" x2="95" y2="142" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <path d="M89 137 L95 131 L101 137" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M89 145 Q95 142 101 145" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".8"/>
       </g>`;
-    duruEl.innerHTML = duruBodySVG(wingAnimL, wingAnimR, bodyAnim, shareBadge);
+    duruEl.innerHTML = makeDuruSVG(wlAnim, wrAnim, rootAnim, badge);
     title.innerHTML = '익명 피드에<br>살짝 흘려보냈어요';
     desc.textContent = '누군가 비슷한 마음으로 읽고 있을지도 몰라요.';
     dots.innerHTML = ['#F1948A','#C0392B','#F4D03F'].map((c,i)=>
