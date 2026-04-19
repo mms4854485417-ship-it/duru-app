@@ -651,22 +651,27 @@ body{background:#0F0E0C;font-family:'Pretendard',sans-serif;min-height:100vh;dis
 .modal-photos.multi .stack img{flex:1;width:100%;object-fit:cover;display:block;}
 
 /* 피드 카드 상세 모달 */
-.feed-modal-bg{position:absolute;inset:0;background:var(--c-overlay);z-index:100;display:none;align-items:flex-end;justify-content:center;}
-.feed-modal-bg.show{display:flex;animation:modalBgIn .25s ease;}
-.feed-modal{background:white;border-radius:28px 28px 0 0;width:100%;max-height:82%;overflow-y:auto;padding:0 0 32px;}
-.feed-modal-handle{width:36px;height:4px;background:rgba(0,0,0,.15);border-radius:2px;margin:12px auto 16px;}
-.feed-modal-head{padding:0 24px 14px;border-bottom:1px solid rgba(0,0,0,.07);}
-.feed-modal-emot{display:flex;align-items:center;gap:7px;margin-bottom:8px;}
-.feed-modal-dot{width:9px;height:9px;border-radius:50%;}
-.feed-modal-ename{font-size:12px;font-weight:600;color:var(--c-text-sub);}
-.feed-modal-time{font-size:11px;color:var(--c-text-faint);margin-left:auto;}
-.feed-modal-title{font-size:18px;font-weight:800;color:var(--c-text);line-height:1.35;word-break:keep-all;}
-.feed-modal-body{padding:16px 24px;font-size:15px;color:var(--c-text-muted);line-height:1.8;word-break:keep-all;}
-.feed-modal-footer{padding:0 24px;display:flex;justify-content:flex-end;}
-.feed-modal-close{position:absolute;top:14px;right:20px;background:var(--c-close-btn);border:none;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:var(--c-close-fg);}
-@keyframes modalBgIn{from{opacity:0;}to{opacity:1;}}
-@keyframes modalSlideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
-.feed-modal{animation:modalSlideUp .3s cubic-bezier(.16,1,.3,1);}
+/* ── 피드 카드 확장 (Shared Element Transition) ── */
+#feed-backdrop{position:absolute;inset:0;z-index:150;pointer-events:none;opacity:0;transition:opacity 320ms cubic-bezier(.32,0,.15,1);backdrop-filter:blur(0px);}
+#feed-backdrop.active{pointer-events:auto;opacity:1;backdrop-filter:blur(8px);}
+#feed-expand{position:absolute;z-index:200;overflow:hidden;background:var(--c-bg-card);border:1px solid var(--c-border);will-change:top,left,width,height,border-radius;transition:top 320ms cubic-bezier(.32,0,.15,1),left 320ms cubic-bezier(.32,0,.15,1),width 320ms cubic-bezier(.32,0,.15,1),height 320ms cubic-bezier(.32,0,.15,1),border-radius 320ms cubic-bezier(.32,0,.15,1);display:none;flex-direction:column;}
+#feed-expand.open{display:flex;}
+#feed-expand-inner{display:flex;flex-direction:column;height:100%;opacity:0;transition:opacity 160ms ease 80ms;}
+#feed-expand.expanded #feed-expand-inner{opacity:1;}
+#feed-expand-header{display:flex;align-items:center;gap:8px;padding:18px 20px 12px;flex-shrink:0;border-bottom:1px solid var(--c-border);}
+#feed-expand-emots{display:flex;align-items:center;gap:6px;flex:1;min-width:0;}
+#feed-expand-ename{font-size:12px;font-weight:700;color:var(--c-text-sub);}
+#feed-expand-time{font-size:11px;color:var(--c-text-faint);}
+#feed-expand-close{width:30px;height:30px;border-radius:50%;background:var(--c-close-btn);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:var(--c-close-fg);flex-shrink:0;}
+#feed-expand-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px 20px 0;}
+#feed-expand-title{font-size:21px;font-weight:800;color:var(--c-text);line-height:1.35;word-break:keep-all;margin-bottom:14px;}
+#feed-expand-body{font-size:15px;color:var(--c-text-muted);line-height:1.85;word-break:keep-all;padding-bottom:20px;}
+#feed-expand-footer{flex-shrink:0;padding:14px 20px 28px;border-top:1px solid var(--c-border);display:flex;align-items:center;gap:8px;}
+.feed-react-btn{flex:1;border:1.5px solid var(--c-border);border-radius:14px;background:var(--c-bg);padding:10px 6px;font-size:12px;font-weight:600;color:var(--c-text-sub);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:background .2s,border-color .2s,transform .15s;}
+.feed-react-btn:active{transform:scale(.95);}
+.feed-react-btn.reacted{background:var(--c-bg-card);border-color:#C0392B;color:#C0392B;}
+.feed-react-emoji{font-size:18px;line-height:1;}
+.feed-react-label{font-size:10px;font-weight:700;}
 
 /* ── 방향성 화면 전환 ── */
 @keyframes screenInFromRight{from{opacity:0;transform:translateX(30px);}to{opacity:1;transform:translateX(0);}}
@@ -741,8 +746,10 @@ body{background:#0F0E0C;font-family:'Pretendard',sans-serif;min-height:100vh;dis
 /* 피드 */
 [data-theme="dark"] .like-btn{border-color:rgba(255,255,255,.1) !important;}
 
-/* 모달 */
-[data-theme="dark"] .feed-modal-head{border-bottom-color:rgba(255,255,255,.06) !important;}
+/* 피드 확장 다크모드 */
+[data-theme="dark"] #feed-expand-header{border-bottom-color:rgba(255,255,255,.06) !important;}
+[data-theme="dark"] #feed-expand-footer{border-top-color:rgba(255,255,255,.06) !important;}
+[data-theme="dark"] #feed-expand{background:#1A1A16 !important;border-color:rgba(255,255,255,.08) !important;}
 
 /* 일기 작성 */
 
@@ -3133,31 +3140,40 @@ async function signOut() {
           <span class="tab-lbl">나</span>
         </div>
       </div>
-    <!-- 피드 카드 상세 모달 -->
-    <div class="feed-modal-bg" id="feed-modal-bg" onclick="closeFeedModal(event)">
-      <div class="feed-modal" id="feed-modal">
-        <button class="feed-modal-close" onclick="closeFeedModal()">✕</button>
-        <div class="feed-modal-handle"></div>
-        <div class="feed-modal-head">
-          <div class="feed-modal-emot">
-            <div class="feed-modal-dot" id="modal-dot"></div>
-            <span class="feed-modal-ename" id="modal-emotion"></span>
-            <span class="feed-modal-time" id="modal-time"></span>
-          </div>
-          <div class="feed-modal-title" id="modal-title"></div>
-        </div>
-        <div id="modal-photos"></div>
-        <div class="feed-modal-body" id="modal-body"></div>
-        <div class="feed-modal-footer">
-          <button class="like-btn" id="modal-like-btn" onclick="toggleModalLike()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            <span class="like-count" id="modal-like-count"></span>
-          </button>
-        </div>
+    <!-- 피드 카드 확장 배경 블러 -->
+    <div id="feed-backdrop"></div>
+
+  </div><!-- /screen-feed -->
+
+  <!-- 피드 카드 확장 오버레이 (position:fixed, screen 밖) -->
+  <div id="feed-expand">
+    <div id="feed-expand-inner">
+      <div id="feed-expand-header">
+        <div id="feed-expand-emots"></div>
+        <span id="feed-expand-time"></span>
+        <button id="feed-expand-close" onclick="closeFeedExpand()">✕</button>
+      </div>
+      <div id="feed-expand-scroll">
+        <div id="feed-expand-title"></div>
+        <div id="feed-expand-body"></div>
+      </div>
+      <div id="feed-expand-footer">
+        <button class="feed-react-btn" id="react-empathy" onclick="toggleReact('empathy')">
+          <span class="feed-react-emoji">🤍</span>
+          <span class="feed-react-label">공감해요</span>
+        </button>
+        <button class="feed-react-btn" id="react-same" onclick="toggleReact('same')">
+          <span class="feed-react-emoji">🌧</span>
+          <span class="feed-react-label">나도 그랬어</span>
+        </button>
+        <button class="feed-react-btn" id="react-cheer" onclick="toggleReact('cheer')">
+          <span class="feed-react-emoji">✨</span>
+          <span class="feed-react-label">괜찮아질 거야</span>
+        </button>
       </div>
     </div>
-
   </div>
+
 </div>
 
 <script>
@@ -3199,6 +3215,16 @@ function goTo(id) {
     closeAIDuru();
     const tog = document.getElementById('ai-toggle');
     if(tog) tog.classList.remove('on');
+  }
+  // 피드 확장 화면 이탈 시 닫기
+  if (curScreen === 'screen-feed' && id !== 'screen-feed') {
+    const ex = document.getElementById('feed-expand');
+    if (ex && ex.classList.contains('open')) {
+      ex.classList.remove('open','expanded');
+      ex.style.cssText = '';
+      document.getElementById('feed-backdrop').classList.remove('active');
+      if (_expandedCardEl) { _expandedCardEl.style.opacity = ''; _expandedCardEl = null; }
+    }
   }
   const prev = document.getElementById(curScreen);
   prev.classList.remove('active');
@@ -4839,47 +4865,148 @@ function toggleLike(i, btn) {
   btn.querySelector('.like-count').textContent = feedData[i].likes + (isLiked ? 1 : 0);
 }
 
-/* ── 피드 카드 모달 ── */
+/* ── 피드 카드 확장 (Shared Element Transition) ── */
+const _EMOTION_TINT = {
+  '우울':'rgba(93,138,168,.15)','기쁨':'rgba(244,208,63,.12)','외로움':'rgba(127,140,141,.13)',
+  '평온':'rgba(133,193,233,.12)','불안':'rgba(149,165,166,.12)','설렘':'rgba(241,148,138,.12)',
+  '화남':'rgba(192,57,43,.10)','공허함':'rgba(189,195,199,.10)','슬픔':'rgba(174,182,191,.12)',
+  '분노':'rgba(192,57,43,.10)'
+};
+let _expandedCardEl = null;
+let _expandSwipeStartY = 0;
+let _expandReacts = {};
+
 function openFeedModal(i) {
   curModalIdx = i;
   const d = feedData[i];
   const ems = getEmotions(d);
-  // 다중 감정 도트
-  const modalDotEl = document.getElementById('modal-dot');
-  const emot = modalDotEl ? modalDotEl.parentElement : null;
-  if (emot) {
-    emot.innerHTML = `<div style="display:flex;gap:4px;align-items:center;">${buildDotsHTML(ems,9)}</div>
-      <span class="feed-modal-ename">${ems.map(em=>em.e).join(' · ')}</span>
-      <span class="feed-modal-time" id="modal-time"></span>`;
-    const mt = document.getElementById('modal-time');
-    if (mt) mt.textContent = d.time;
-  } else if (modalDotEl) {
-    modalDotEl.style.background = d.dot;
-    const emoEl = document.getElementById('modal-emotion');
-    if (emoEl) emoEl.textContent = d.e;
+
+  /* 1. 클릭된 카드 DOM 확보 */
+  const cardEl = document.querySelector(`.feed-card[data-idx="${i}"]`);
+  if (!cardEl) return;
+  _expandedCardEl = cardEl;
+
+  /* 2. First: 카드의 현재 위치/크기 (phone-relative) */
+  const phoneEl = document.querySelector('.phone');
+  const pr  = phoneEl ? phoneEl.getBoundingClientRect() : {top:0,left:0};
+  const cr  = cardEl.getBoundingClientRect();
+  const r   = { top: cr.top - pr.top, left: cr.left - pr.left, width: cr.width, height: cr.height };
+
+  /* 3. expand 패널 내용 채우기 */
+  document.getElementById('feed-expand-emots').innerHTML =
+    `<div style="display:flex;gap:4px;align-items:center;margin-right:6px;">${buildDotsHTML(ems,9)}</div>
+     <span id="feed-expand-ename" style="font-size:12px;font-weight:700;color:var(--c-text-sub);">${ems.map(em=>em.e).join(' · ')}</span>`;
+  document.getElementById('feed-expand-time').textContent = d.time;
+  document.getElementById('feed-expand-title').textContent = d.title;
+  document.getElementById('feed-expand-body').textContent = d.body;
+  document.getElementById('feed-expand-scroll').scrollTop = 0;
+
+  /* 4. 반응 버튼 상태 초기화 */
+  _expandReacts = {};
+  ['empathy','same','cheer'].forEach(k => {
+    const btn = document.getElementById('react-' + k);
+    if (btn) btn.classList.remove('reacted');
+  });
+
+  /* 5. expand 패널을 카드 위치·크기로 시작 (display:flex + 카드 rect) */
+  const ex = document.getElementById('feed-expand');
+  ex.style.transition = 'none';
+  ex.style.top    = r.top + 'px';
+  ex.style.left   = r.left + 'px';
+  ex.style.width  = r.width + 'px';
+  ex.style.height = r.height + 'px';
+  ex.style.borderRadius = '20px';
+  ex.classList.add('open');
+
+  /* 배경 틴트 색상 */
+  const tint = _EMOTION_TINT[ems[0]?.e] || 'rgba(0,0,0,.04)';
+  const backdrop = document.getElementById('feed-backdrop');
+  backdrop.style.background = tint;
+
+  /* 카드 살짝 희미하게 */
+  cardEl.style.opacity = '0.3';
+
+  /* 6. 다음 프레임에 full-screen으로 트랜지션 */
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      ex.style.transition = '';
+      ex.style.top    = '0px';
+      ex.style.left   = '0px';
+      ex.style.width  = '100%';
+      ex.style.height = '100%';
+      ex.style.borderRadius = '0px';
+      ex.classList.add('expanded');
+      backdrop.classList.add('active');
+    });
+  });
+
+  /* 7. 스와이프 다운 제스처 */
+  ex.addEventListener('touchstart', _expandTouchStart, { passive: true });
+  ex.addEventListener('touchmove',  _expandTouchMove,  { passive: false });
+  ex.addEventListener('touchend',   _expandTouchEnd,   { passive: true });
+}
+
+function _expandTouchStart(e) { _expandSwipeStartY = e.touches[0].clientY; }
+function _expandTouchMove(e) {
+  const dy = e.touches[0].clientY - _expandSwipeStartY;
+  if (dy > 0) {
+    e.preventDefault();
+    const ex = document.getElementById('feed-expand');
+    ex.style.transition = 'none';
+    ex.style.transform = `translateY(${dy * 0.4}px)`;
   }
-  const modalTimeEl = document.getElementById('modal-time');
-  if (modalTimeEl) modalTimeEl.textContent = d.time;
-  document.getElementById('modal-title').textContent = d.title;
-  document.getElementById('modal-body').textContent = d.body;
-  document.getElementById('modal-photos').innerHTML = buildFeedPhotoHTML(d.imgs, 'modal-photos');
-  const liked = likedSet.has(i);
-  const btn = document.getElementById('modal-like-btn');
-  btn.className = 'like-btn' + (liked ? ' liked' : '');
-  const svg = btn.querySelector('svg');
-  svg.setAttribute('fill', liked ? '#C0392B' : 'none');
-  svg.setAttribute('stroke', liked ? '#C0392B' : '#aaa');
-  document.getElementById('modal-like-count').textContent = d.likes + (liked ? 1 : 0);
-  document.getElementById('feed-modal-bg').classList.add('show');
 }
-function closeFeedModal(e) {
-  if (e && e.target !== document.getElementById('feed-modal-bg')) return;
-  document.getElementById('feed-modal-bg').classList.remove('show');
+function _expandTouchEnd(e) {
+  const dy = e.changedTouches[0].clientY - _expandSwipeStartY;
+  const ex = document.getElementById('feed-expand');
+  ex.style.transform = '';
+  if (dy > 80) closeFeedExpand();
 }
-function toggleModalLike() {
-  if (curModalIdx < 0) return;
-  toggleLike(curModalIdx, document.getElementById('modal-like-btn'));
-  renderFeed();
+
+function closeFeedExpand() {
+  const ex = document.getElementById('feed-expand');
+  const backdrop = document.getElementById('feed-backdrop');
+
+  /* 카드 원래 위치로 수렴 */
+  if (_expandedCardEl) {
+    const phoneEl = document.querySelector('.phone');
+    const pr  = phoneEl ? phoneEl.getBoundingClientRect() : {top:0,left:0};
+    const cr  = _expandedCardEl.getBoundingClientRect();
+    ex.style.transition = 'top 320ms cubic-bezier(.32,0,.15,1),left 320ms cubic-bezier(.32,0,.15,1),width 320ms cubic-bezier(.32,0,.15,1),height 320ms cubic-bezier(.32,0,.15,1),border-radius 320ms cubic-bezier(.32,0,.15,1),opacity 280ms ease';
+    ex.style.top    = (cr.top - pr.top) + 'px';
+    ex.style.left   = (cr.left - pr.left) + 'px';
+    ex.style.width  = cr.width + 'px';
+    ex.style.height = cr.height + 'px';
+    ex.style.borderRadius = '20px';
+    ex.style.opacity = '0';
+  }
+  ex.classList.remove('expanded');
+  backdrop.classList.remove('active');
+
+  /* 내용 페이드 아웃 즉시 */
+  document.getElementById('feed-expand-inner').style.opacity = '0';
+
+  setTimeout(() => {
+    ex.classList.remove('open');
+    ex.style.opacity = '';
+    ex.style.top = ex.style.left = ex.style.width = ex.style.height = '';
+    ex.style.borderRadius = '';
+    document.getElementById('feed-expand-inner').style.opacity = '';
+    if (_expandedCardEl) { _expandedCardEl.style.opacity = ''; _expandedCardEl = null; }
+    ex.removeEventListener('touchstart', _expandTouchStart);
+    ex.removeEventListener('touchmove',  _expandTouchMove);
+    ex.removeEventListener('touchend',   _expandTouchEnd);
+  }, 340);
+}
+
+/* 하위 호환 alias */
+function closeFeedModal(e) { closeFeedExpand(); }
+function toggleModalLike() {}
+
+function toggleReact(key) {
+  _expandReacts[key] = !_expandReacts[key];
+  const btn = document.getElementById('react-' + key);
+  if (btn) btn.classList.toggle('reacted', !!_expandReacts[key]);
 }
 
 async function initFeed() {
