@@ -417,16 +417,21 @@ body{background:#0F0E0C;font-family:'Pretendard',sans-serif;min-height:100vh;dis
 /* ── 저장 방식 선택 팝 ── */
 @keyframes saveOptPop{0%{transform:scale(1);}35%{transform:scale(.96);}70%{transform:scale(1.025);}100%{transform:scale(1);}}
 /* ── 저장 완료 오버레이 ── */
-@keyframes saveOverlayIn{0%{opacity:0;transform:scale(.92);}100%{opacity:1;transform:scale(1);}}
-@keyframes saveIconLock{0%{transform:rotate(-15deg) scale(.8);opacity:0;}60%{transform:rotate(5deg) scale(1.15);}100%{transform:rotate(0deg) scale(1);opacity:1;}}
-@keyframes saveIconFly{0%{transform:translateY(10px) scale(.8);opacity:0;}50%{transform:translateY(-8px) scale(1.1);opacity:1;}100%{transform:translateY(0) scale(1);opacity:1;}}
+@keyframes saveOverlayIn{0%{opacity:0;}100%{opacity:1;}}
+@keyframes saveDuruIn{0%{opacity:0;transform:translateY(28px);}100%{opacity:1;transform:translateY(0);}}
+@keyframes saveDuruFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+@keyframes saveDuruHug{0%,100%{transform:rotate(0deg);}25%{transform:rotate(-6deg);}75%{transform:rotate(5deg);}}
+@keyframes saveDuruJump{0%{transform:translateY(0) scaleY(1);}20%{transform:translateY(-22px) scaleY(1.05);}40%{transform:translateY(-28px) scaleY(.97);}60%{transform:translateY(-14px) scaleY(1.02);}80%{transform:translateY(-4px) scaleY(1);}100%{transform:translateY(0) scaleY(1);}}
+@keyframes saveWingFlap{0%,100%{transform:rotate(0deg);}30%{transform:rotate(-28deg);}60%{transform:rotate(12deg);}}
+@keyframes saveLockDrop{0%{opacity:0;transform:translateY(-14px) scale(.7);}60%{transform:translateY(3px) scale(1.1);}100%{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes saveShareRise{0%{opacity:0;transform:translateY(10px) scale(.8);}50%{transform:translateY(-6px) scale(1.05);}100%{opacity:1;transform:translateY(0) scale(1);}}
 @keyframes saveDotPop{0%,100%{transform:scale(0);opacity:0;}50%{transform:scale(1);opacity:1;}}
-#save-complete-overlay{position:absolute;inset:0;z-index:500;display:none;flex-direction:column;align-items:center;justify-content:center;gap:0;background:var(--c-bg);}
-#save-complete-overlay.show{display:flex;animation:saveOverlayIn .35s cubic-bezier(.16,1,.3,1);}
-.save-complete-icon-wrap{width:88px;height:88px;border-radius:28px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;}
+#save-complete-overlay{position:absolute;inset:0;z-index:500;display:none;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:var(--c-bg);}
+#save-complete-duru{position:relative;width:160px;height:180px;display:flex;align-items:flex-end;justify-content:center;}
+#save-complete-overlay.show{display:flex;animation:saveOverlayIn .3s ease;}
 #save-complete-title{font-size:22px;font-weight:900;color:var(--c-text);text-align:center;line-height:1.3;margin-bottom:10px;word-break:keep-all;}
-#save-complete-desc{font-size:14px;color:var(--c-text-sub);text-align:center;line-height:1.7;word-break:keep-all;}
-.save-complete-dots{display:flex;gap:6px;margin-top:28px;}
+#save-complete-desc{font-size:14px;color:var(--c-text-sub);text-align:center;line-height:1.7;word-break:keep-all;max-width:240px;}
+.save-complete-dots{display:flex;gap:6px;margin-top:24px;}
 .save-complete-dot{width:6px;height:6px;border-radius:50%;}
 
 /* 감정 선택 두루 애니메이션 (legacy, kept for ref) */
@@ -2928,9 +2933,8 @@ async function signOut() {
 
     <!-- 저장 완료 오버레이 (비공개 / 공유) -->
     <div id="save-complete-overlay">
-      <div class="save-complete-icon-wrap" id="save-complete-icon-wrap">
-        <svg id="save-complete-svg" width="44" height="44" viewBox="0 0 44 44" fill="none"></svg>
-      </div>
+      <!-- 두루 캐릭터 영역 -->
+      <div id="save-complete-duru" style="position:relative;width:160px;height:180px;margin-bottom:8px;"></div>
       <div id="save-complete-title"></div>
       <div id="save-complete-desc"></div>
       <div class="save-complete-dots" id="save-complete-dots"></div>
@@ -3727,36 +3731,81 @@ function handleSave() {
 
 function showSaveComplete(type) {
   const overlay  = document.getElementById('save-complete-overlay');
-  const iconWrap = document.getElementById('save-complete-icon-wrap');
-  const svg      = document.getElementById('save-complete-svg');
+  const duruEl   = document.getElementById('save-complete-duru');
   const title    = document.getElementById('save-complete-title');
   const desc     = document.getElementById('save-complete-desc');
   const dots     = document.getElementById('save-complete-dots');
   if (!overlay) { setTimeout(()=>goTo('screen-home'), 400); return; }
 
+  /* ── 두루 기본 SVG (몸통 + 날개 + 얼굴) ── */
+  const duruBodySVG = (wingAnimL='', wingAnimR='', bodyAnim='', extraBadge='') => `
+    <svg width="160" height="180" viewBox="0 0 160 180" fill="none" xmlns="http://www.w3.org/2000/svg"
+         style="animation:saveDuruIn .45s cubic-bezier(.34,1.56,.64,1) both;">
+      <!-- 몸통 -->
+      <g style="${bodyAnim}">
+        <!-- 왼쪽 날개 -->
+        <g style="transform-origin:90px 105px;${wingAnimL}">
+          <ellipse cx="52" cy="118" rx="22" ry="13" fill="#E8F4F8" transform="rotate(-20 52 118)"/>
+        </g>
+        <!-- 오른쪽 날개 -->
+        <g style="transform-origin:70px 105px;${wingAnimR}">
+          <ellipse cx="108" cy="118" rx="22" ry="13" fill="#E8F4F8" transform="rotate(20 108 118)"/>
+        </g>
+        <!-- 몸통 원 -->
+        <ellipse cx="80" cy="115" rx="38" ry="42" fill="#F0F8FF"/>
+        <!-- 빨간 모자 -->
+        <ellipse cx="80" cy="76" rx="26" ry="8" fill="#C0392B"/>
+        <rect x="62" y="52" width="36" height="26" rx="16" fill="#C0392B"/>
+        <rect x="68" y="48" width="24" height="10" rx="5" fill="#A93226"/>
+        <!-- 얼굴(흰 동그라미) -->
+        <circle cx="80" cy="78" r="22" fill="white"/>
+        <!-- 눈 -->
+        <circle cx="74" cy="76" r="3.5" fill="#1A1A14"/>
+        <circle cx="86" cy="76" r="3.5" fill="#1A1A14"/>
+        <circle cx="75.2" cy="74.8" r="1.2" fill="white"/>
+        <circle cx="87.2" cy="74.8" r="1.2" fill="white"/>
+        <!-- 부리 -->
+        <path d="M77 82 Q80 86 83 82" stroke="#E67E22" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <!-- 볼터치 -->
+        <ellipse cx="70" cy="81" rx="5" ry="3" fill="#FADADD" opacity=".7"/>
+        <ellipse cx="90" cy="81" rx="5" ry="3" fill="#FADADD" opacity=".7"/>
+        <!-- 발 -->
+        <ellipse cx="70" cy="155" rx="9" ry="5" fill="#E67E22"/>
+        <ellipse cx="90" cy="155" rx="9" ry="5" fill="#E67E22"/>
+      </g>
+      ${extraBadge}
+    </svg>`;
+
   if (type === 'private') {
-    iconWrap.style.background = 'rgba(26,26,20,.07)';
-    svg.innerHTML = `
-      <g style="animation:saveIconLock .5s cubic-bezier(.34,1.56,.64,1) .1s both;">
-        <rect x="10" y="20" width="24" height="17" rx="4" fill="#1A1A14"/>
-        <path d="M15 20v-5a7 7 0 0 1 14 0v5" stroke="#1A1A14" stroke-width="3" fill="none" stroke-linecap="round"/>
-        <circle cx="22" cy="29" r="3" fill="white"/>
-        <line x1="22" y1="29" x2="22" y2="33" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+    /* 비공개 — 두루가 일기를 꼭 안아주는 느낌, gentle sway */
+    const bodyAnim = 'animation:saveDuruHug 1.6s ease-in-out .5s infinite;transform-origin:80px 115px;';
+    const lockBadge = `
+      <g style="animation:saveLockDrop .5s cubic-bezier(.34,1.56,.64,1) .55s both;">
+        <circle cx="118" cy="148" r="18" fill="#1A1A14"/>
+        <rect x="110" y="150" width="16" height="11" rx="3" fill="white"/>
+        <path d="M112 150v-3.5a6 6 0 0 1 12 0v3.5" stroke="white" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+        <circle cx="118" cy="156" r="2" fill="#1A1A14"/>
+        <line x1="118" y1="156" x2="118" y2="159" stroke="#1A1A14" stroke-width="1.6" stroke-linecap="round"/>
       </g>`;
+    duruEl.innerHTML = duruBodySVG('', '', bodyAnim, lockBadge);
     title.innerHTML = '오늘 하루를<br>나만의 공간에 담았어요';
     desc.textContent = '아무도 볼 수 없는, 오직 나만의 기록이에요.';
     dots.innerHTML = ['#F4D03F','#85C1E9','#F1948A'].map((c,i)=>
       `<div class="save-complete-dot" style="background:${c};animation:saveDotPop .4s ease ${.3+i*.12}s both;"></div>`
     ).join('');
   } else {
-    iconWrap.style.background = 'rgba(192,57,43,.08)';
-    svg.innerHTML = `
-      <g style="animation:saveIconFly .5s cubic-bezier(.34,1.56,.64,1) .1s both;">
-        <line x1="22" y1="6" x2="22" y2="22" stroke="#C0392B" stroke-width="2.5" stroke-linecap="round"/>
-        <path d="M14 14 L22 6 L30 14" stroke="#C0392B" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M10 28 Q22 22 34 28" stroke="#C0392B" stroke-width="2" fill="none" stroke-linecap="round" opacity=".4"/>
-        <path d="M14 34 Q22 30 30 34" stroke="#C0392B" stroke-width="2" fill="none" stroke-linecap="round" opacity=".2"/>
+    /* 공유 — 두루가 신나서 점프 + 날개 펄럭 */
+    const bodyAnim = 'animation:saveDuruJump .7s cubic-bezier(.34,1.56,.64,1) .3s 2;transform-origin:80px 155px;';
+    const wingAnimL = 'animation:saveWingFlap .35s ease-in-out .3s 4;';
+    const wingAnimR = 'animation:saveWingFlap .35s ease-in-out .38s 4;';
+    const shareBadge = `
+      <g style="animation:saveShareRise .5s cubic-bezier(.34,1.56,.64,1) .4s both;">
+        <circle cx="118" cy="148" r="18" fill="#C0392B"/>
+        <line x1="118" y1="141" x2="118" y2="153" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M112 147 L118 141 L124 147" stroke="white" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M112 156 Q118 153 124 156" stroke="white" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".7"/>
       </g>`;
+    duruEl.innerHTML = duruBodySVG(wingAnimL, wingAnimR, bodyAnim, shareBadge);
     title.innerHTML = '익명 피드에<br>살짝 흘려보냈어요';
     desc.textContent = '누군가 비슷한 마음으로 읽고 있을지도 몰라요.';
     dots.innerHTML = ['#F1948A','#C0392B','#F4D03F'].map((c,i)=>
@@ -3770,7 +3819,7 @@ function showSaveComplete(type) {
     overlay.style.display = 'none';
     goTo('screen-home');
     setTimeout(() => { overlay.style.display = ''; }, 300);
-  }, 2000);
+  }, 2400);
 }
 
 function confirmRelease() {
