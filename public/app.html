@@ -4853,7 +4853,8 @@ window.addEventListener('load', ()=>{
             greetEl.style.opacity = '0';
             setTimeout(() => {
               const _uname2 = localStorage.getItem('duru_user_name') || '민준';
-              greetEl.innerHTML = (pick[0] + '<br>' + pick[1]).replace(/민준/g, _uname2);
+              window._homeGreetingTemplate = pick[0] + '<br>' + pick[1];
+              greetEl.innerHTML = window._homeGreetingTemplate.replace(/민준/g, _uname2);
               greetEl.style.opacity = '1';
             }, 350);
           }
@@ -4931,10 +4932,12 @@ window.addEventListener('load', ()=>{
     };
 
     const pick = window._pickGreeting(null);
+    // 원본 템플릿("민준" 포함) 저장 — 이름 치환 시 항상 이 원본에서 재적용
+    window._homeGreetingTemplate = pick[0] + '<br>' + pick[1];
     const greetEl = document.getElementById('home-greeting');
     if (greetEl) {
       const _uname = localStorage.getItem('duru_user_name') || '민준';
-      greetEl.innerHTML = (pick[0] + '<br>' + pick[1]).replace(/민준/g, _uname);
+      greetEl.innerHTML = window._homeGreetingTemplate.replace(/민준/g, _uname);
     }
 
     applyTimeBg(period);
@@ -5159,11 +5162,15 @@ function applyUserName(name) {
   });
 }
 
-// home-greeting에만 이름 적용 (applyUserName과 분리)
+// home-greeting에만 이름 적용 — 항상 원본 템플릿("민준")에서 치환해 중복 방지
 function applyHomeGreetingName(name) {
   if (!name || name === '민준') return;
   const greetEl = document.getElementById('home-greeting');
-  if (greetEl && greetEl.innerHTML.includes('민준')) {
+  if (!greetEl) return;
+  if (window._homeGreetingTemplate) {
+    // 원본 템플릿에서 치환 → 탭 이동 반복해도 안전
+    greetEl.innerHTML = window._homeGreetingTemplate.replace(/민준/g, name);
+  } else if (greetEl.innerHTML.includes('민준')) {
     greetEl.innerHTML = greetEl.innerHTML.replace(/민준/g, name);
   }
 }
