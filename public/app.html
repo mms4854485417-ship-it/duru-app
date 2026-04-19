@@ -673,6 +673,35 @@ body{background:#0F0E0C;font-family:'Pretendard',sans-serif;min-height:100vh;dis
 .feed-react-emoji{font-size:18px;line-height:1;}
 .feed-react-label{font-size:10px;font-weight:700;}
 
+/* ── 두루 월간 리포트 ── */
+#monthly-report-card{background:white;border-radius:24px;padding:20px;margin-bottom:12px;border:1px solid rgba(0,0,0,.06);overflow:hidden;position:relative;}
+.report-shimmer{background:linear-gradient(90deg,#f0ede8 25%,#e8e4de 50%,#f0ede8 75%);background-size:200% 100%;animation:reportShimmer 1.4s ease infinite;border-radius:8px;}
+@keyframes reportShimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+.report-month-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(192,57,43,.08);border-radius:10px;padding:3px 10px;margin-bottom:12px;}
+.report-month-text{font-size:11px;font-weight:800;color:#C0392B;letter-spacing:.04em;}
+.report-duru-row{display:flex;align-items:flex-end;gap:10px;margin-bottom:16px;}
+.report-bubble{flex:1;background:#F5F3EE;border-radius:16px 16px 16px 4px;padding:12px 14px;position:relative;}
+.report-bubble-text{font-size:13px;font-weight:600;color:#1A1A14;line-height:1.65;word-break:keep-all;}
+.report-emotions-row{display:flex;flex-direction:column;gap:7px;}
+.report-emotion-bar-wrap{display:flex;align-items:center;gap:8px;}
+.report-emotion-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.report-emotion-name{font-size:11px;font-weight:700;color:#666;width:32px;flex-shrink:0;}
+.report-emotion-track{flex:1;height:6px;background:rgba(0,0,0,.06);border-radius:3px;overflow:hidden;}
+.report-emotion-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.16,1,.3,1);}
+.report-emotion-count{font-size:10px;font-weight:700;color:#aaa;width:20px;text-align:right;flex-shrink:0;}
+.report-highlight{display:flex;align-items:flex-start;gap:8px;background:#FAFAF8;border-radius:12px;padding:10px 12px;margin-top:12px;border:1px solid rgba(0,0,0,.05);}
+.report-highlight-icon{font-size:16px;line-height:1;flex-shrink:0;margin-top:1px;}
+.report-highlight-text{font-size:12px;color:#666;line-height:1.55;font-weight:500;}
+.report-highlight-text strong{color:#1A1A14;font-weight:800;}
+.report-empty{text-align:center;padding:20px 0 8px;}
+.report-empty-text{font-size:13px;color:#aaa;font-weight:500;line-height:1.6;}
+[data-theme="dark"] #monthly-report-card{background:#1A1A16 !important;border-color:rgba(255,255,255,.07) !important;}
+[data-theme="dark"] .report-bubble{background:rgba(255,255,255,.06) !important;}
+[data-theme="dark"] .report-bubble-text{color:#E8E4DC !important;}
+[data-theme="dark"] .report-highlight{background:rgba(255,255,255,.04) !important;border-color:rgba(255,255,255,.06) !important;}
+[data-theme="dark"] .report-highlight-text{color:#888 !important;}
+[data-theme="dark"] .report-highlight-text strong{color:#D0CCC4 !important;}
+
 /* ── 방향성 화면 전환 ── */
 @keyframes screenInFromRight{from{opacity:0;transform:translateX(30px);}to{opacity:1;transform:translateX(0);}}
 @keyframes screenInFromLeft{from{opacity:0;transform:translateX(-30px);}to{opacity:1;transform:translateX(0);}}
@@ -1807,6 +1836,19 @@ async function signOut() {
           </div>
         </div>
 
+
+        <!-- ② 두루 월간 감정 리포트 -->
+        <div id="monthly-report-card">
+          <!-- 로딩 shimmer (초기) -->
+          <div id="report-loading">
+            <div class="report-shimmer" style="height:14px;width:80px;margin-bottom:14px;"></div>
+            <div class="report-shimmer" style="height:56px;margin-bottom:14px;"></div>
+            <div class="report-shimmer" style="height:10px;margin-bottom:7px;"></div>
+            <div class="report-shimmer" style="height:10px;width:70%;"></div>
+          </div>
+          <!-- 실제 내용 (JS가 채움) -->
+          <div id="report-content" style="display:none;"></div>
+        </div>
 
         <!-- ③ 날려보낸 일기 보관함 -->
         <div onclick="openReleasedVault()" style="background:white;border-radius:20px;padding:0;margin-bottom:12px;border:1px solid rgba(0,0,0,.06);overflow:hidden;cursor:pointer;transition:transform .15s;" onmousedown="this.style.transform='scale(.985)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.985)'" ontouchend="this.style.transform=''">
@@ -3270,7 +3312,7 @@ function goTo(id) {
       .then(realData => { Object.assign(diaryMockData, realData); renderCalendar(); })
       .catch(() => renderCalendar());
   }
-  if (id === 'screen-mypage') { renderReleased(); loadMypageStats(); }
+  if (id === 'screen-mypage') { renderReleased(); loadMypageStats(); loadMonthlyReport(); }
   if (id === 'screen-book') { initBookScreen(); }
   if (id === 'screen-emotion') {
     setTimeout(resetEmoDuru, 100);
@@ -4051,6 +4093,170 @@ async function loadMypageStats() {
   if (totalEl)   totalEl.textContent   = total;
   if (streakEl)  streakEl.textContent  = streak ? `${streak}일` : '0일';
   if (longestEl) longestEl.textContent = `${longest}일`;
+}
+
+/* ── 두루 월간 감정 리포트 ── */
+const _REPORT_DOT = {
+  '기쁨':'#F4D03F','우울':'#5D8AA8','평온':'#85C1E9','외로움':'#7F8C8D',
+  '불안':'#95A5A6','슬픔':'#AEB6BF','분노':'#C0392B','설렘':'#F1948A',
+  '화남':'#C0392B','공허함':'#BDC3C7'
+};
+const _DURU_COMMENTS = {
+  '기쁨':   ['기쁜 날들이 많았던 달이에요 🌟', '환한 날들이 이달을 채웠네요.', '두루도 덩달아 신났어요!'],
+  '평온':   ['잔잔하고 고요한 달이었어요 🌿', '그런 고요함이 쌓여 힘이 돼요.', '평온한 마음이 느껴졌어요.'],
+  '설렘':   ['설레는 일들이 가득했던 달이에요 ✨', '그 두근거림, 오래 기억해요.', '두루도 같이 두근거렸어요!'],
+  '우울':   ['마음이 좀 무거웠던 달이었군요.', '그래도 꺼내 쓴 것만으로 대단해요.', '두루가 항상 곁에 있을게요.'],
+  '외로움': ['혼자인 느낌이 많았군요.', '두루는 언제나 여기 있어요.', '이 공간이 작은 위안이 됐으면 해요.'],
+  '불안':   ['마음이 많이 복잡했겠어요.', '그 감정을 쓴 용기가 대단해요.', '조금씩 나아질 거예요.'],
+  '슬픔':   ['슬픔을 담아뒀군요.', '울어도 괜찮아요, 두루가 옆에 있어요.', '마음이 가벼워지길 바라요.'],
+  '화남':   ['화가 많이 났던 달이네요.', '충분히 그럴 만했을 거예요.', '다 털어내고 편히 쉬어요.'],
+  '분노':   ['화가 많이 났던 달이네요.', '충분히 그럴 만했을 거예요.', '두루가 들어줄게요.'],
+  '공허함': ['텅 빈 느낌이 많았던 달이에요.', '그 빈자리도 두루가 함께할게요.', '곁에 있을게요.'],
+};
+const _DEFAULT_COMMENTS = ['이달도 일기를 썼군요.', '기록하는 것만으로도 대단해요.', '두루가 응원해요!'];
+
+function _pickReportComment(topEmotion) {
+  const pool = _DURU_COMMENTS[topEmotion] || _DEFAULT_COMMENTS;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+const _MONTH_KR = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+
+async function loadMonthlyReport() {
+  const loadingEl = document.getElementById('report-loading');
+  const contentEl = document.getElementById('report-content');
+  if (!loadingEl || !contentEl) return;
+  /* 진입마다 shimmer 다시 보여주기 */
+  loadingEl.style.display = '';
+  contentEl.style.display = 'none';
+  contentEl.innerHTML = '';
+
+  const { data: { user } } = await _sb.auth.getUser();
+  if (!user) return;
+
+  const now   = new Date();
+  const year  = now.getFullYear();
+  const month = now.getMonth();
+  const monthStr = `${year}-${String(month + 1).padStart(2, '0')}`;
+  const monthLabel = `${year}년 ${_MONTH_KR[month]}`;
+
+  const { data: rows } = await _sb.from('diaries')
+    .select('emotion, content, date')
+    .eq('user_id', user.id)
+    .like('date', `${monthStr}%`)
+    .order('date');
+
+  loadingEl.style.display = 'none';
+  contentEl.style.display = 'block';
+
+  /* ── 데이터 없음 ── */
+  if (!rows || rows.length === 0) {
+    contentEl.innerHTML = `
+      <div class="report-month-badge">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#C0392B" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/></svg>
+        <span class="report-month-text">${monthLabel} 리포트</span>
+      </div>
+      <div class="report-empty">
+        <div style="font-size:32px;margin-bottom:8px;">🪹</div>
+        <div class="report-empty-text">이달 일기가 아직 없어요.<br>오늘 하루를 기록해볼까요?</div>
+      </div>`;
+    return;
+  }
+
+  /* ── 감정 집계 ── */
+  const emotionCount = {};
+  rows.forEach(row => {
+    (row.emotion || '').split(', ').filter(Boolean).forEach(e => {
+      emotionCount[e] = (emotionCount[e] || 0) + 1;
+    });
+  });
+  const sorted = Object.entries(emotionCount).sort((a, b) => b[1] - a[1]);
+  const topEmotion = sorted[0]?.[0] || '';
+  const maxCount   = sorted[0]?.[1] || 1;
+  const top3       = sorted.slice(0, 3);
+
+  /* ── 하이라이트: 가장 긴 일기를 쓴 날 ── */
+  let highlightRow = rows[0];
+  rows.forEach(r => {
+    if ((r.content || '').length > (highlightRow.content || '').length) highlightRow = r;
+  });
+  const hlDate = highlightRow?.date
+    ? (() => { const d = new Date(highlightRow.date); return `${d.getMonth()+1}월 ${d.getDate()}일`; })()
+    : null;
+
+  /* ── 두루 코멘트 ── */
+  const comment = _pickReportComment(topEmotion);
+  const diaryCount = rows.length;
+
+  /* ── 감정 바 HTML ── */
+  const barsHTML = top3.map(([eName, cnt]) => `
+    <div class="report-emotion-bar-wrap">
+      <div class="report-emotion-dot" style="background:${_REPORT_DOT[eName] || '#888'};"></div>
+      <div class="report-emotion-name">${eName}</div>
+      <div class="report-emotion-track">
+        <div class="report-emotion-fill" style="width:0%;background:${_REPORT_DOT[eName] || '#888'};opacity:.75;"
+             data-target="${Math.round(cnt / maxCount * 100)}"></div>
+      </div>
+      <div class="report-emotion-count">${cnt}회</div>
+    </div>`).join('');
+
+  /* ── 하이라이트 문구 ── */
+  const hlHTML = hlDate ? `
+    <div class="report-highlight">
+      <div class="report-highlight-icon">📌</div>
+      <div class="report-highlight-text">
+        <strong>${hlDate}</strong>에 가장 많은 마음을 담았어요.<br>
+        그날이 특별했나봐요.
+      </div>
+    </div>` : '';
+
+  /* ── 두루 미니 SVG ── */
+  const duruMiniSVG = `<svg width="52" height="60" viewBox="-8 -10 138 175" fill="none" style="flex-shrink:0;">
+    <g style="transform-origin:20px 80px;">
+      <path d="M20 70 Q3 59 1 74 Q3 93 20 83" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.2"/>
+    </g>
+    <g style="transform-origin:78px 80px;">
+      <path d="M78 70 Q95 59 97 74 Q95 93 78 83" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.2"/>
+    </g>
+    <path d="M37 116 Q33 132 43 138 Q53 142 63 136 Q69 128 65 116" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="1.8"/>
+    <ellipse cx="49" cy="92" rx="32" ry="27" fill="white" stroke="#1A1A14" stroke-width="2.2"/>
+    <path d="M33 116 L26 145" stroke="#1A1A14" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+    <path d="M17 145 Q26 143 32 148" stroke="#1A1A14" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path d="M63 116 L72 145" stroke="#1A1A14" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+    <path d="M66 145 Q72 143 82 148" stroke="#1A1A14" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path d="M46 66 Q43 54 46 42 Q48 32 51 21" stroke="#1A1A14" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <ellipse cx="54" cy="15" rx="19" ry="18" fill="white" stroke="#1A1A14" stroke-width="2.1"/>
+    <ellipse cx="52" cy="5" rx="11" ry="7.5" fill="#C0392B"/>
+    <ellipse cx="50" cy="4" rx="7" ry="4.8" fill="#CC3A2A"/>
+    <ellipse cx="47" cy="2" rx="4.5" ry="2.5" fill="rgba(255,255,255,.28)" transform="rotate(-18 47 2)"/>
+    <ellipse cx="44" cy="15" rx="7" ry="7.5" fill="white" stroke="#1A1A14" stroke-width="1.5"/>
+    <ellipse cx="42" cy="15" rx="4.5" ry="5" fill="#1A1A14"/>
+    <circle cx="43.5" cy="13" r="1.6" fill="white"/>
+    <path d="M68 13 L80 10 L68 20z" fill="#1A1A14" opacity=".9"/>
+  </svg>`;
+
+  contentEl.innerHTML = `
+    <div class="report-month-badge">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#C0392B" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/></svg>
+      <span class="report-month-text">${monthLabel} · 두루의 관찰</span>
+    </div>
+    <div class="report-duru-row">
+      ${duruMiniSVG}
+      <div class="report-bubble">
+        <div class="report-bubble-text">${comment}<br>
+          <span style="font-size:11px;color:#aaa;font-weight:500;margin-top:4px;display:block;">이달 ${diaryCount}번 마음을 꺼냈어요</span>
+        </div>
+      </div>
+    </div>
+    <div class="report-emotions-row">${barsHTML}</div>
+    ${hlHTML}`;
+
+  /* 감정 바 애니메이션: 렌더 직후 width 적용 */
+  requestAnimationFrame(() => {
+    contentEl.querySelectorAll('.report-emotion-fill').forEach(el => {
+      el.style.width = el.dataset.target + '%';
+    });
+  });
 }
 
 function renderReleased() {
