@@ -1121,8 +1121,11 @@ async function initHomeData() {
       const localName = localStorage.getItem('duru_user_name');
       const name = metaName || localName;
       if (name && name !== '민준') {
-        applyUserName(name);
+        // localStorage 없으면 저장 (Google 로그인 등)
         if (!localName) localStorage.setItem('duru_user_name', name);
+        applyUserName(name);
+        // home-greeting은 initHomeGreeting에서 처리됐으므로 중복 시 skip
+        applyHomeGreetingName(name);
       }
     }
   } catch(e) {}
@@ -1746,9 +1749,12 @@ async function signOut() {
               </g>
             </svg>
           </div>
-          <!-- 이름 + 지역 -->
-          <div style="font-size:20px;font-weight:900;color:#1A1A14;margin-bottom:3px;">민준님</div>
-          <div style="font-size:12px;color:#BBBBBB;font-weight:500;">울산 · 2025년 1월부터</div>
+          <!-- 이름 + 수정 -->
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+            <div id="mypage-username" style="font-size:20px;font-weight:900;color:#1A1A14;">민준님</div>
+            <button onclick="editUserName()" style="background:rgba(0,0,0,.06);border:none;border-radius:8px;padding:3px 9px;font-size:11px;font-weight:700;color:#888;font-family:'Pretendard',sans-serif;cursor:pointer;">수정</button>
+          </div>
+          <div style="font-size:12px;color:#BBBBBB;font-weight:500;">두루와 함께한 시간</div>
           <!-- 통계 3칸 -->
           <div style="display:flex;margin-top:20px;padding-top:18px;border-top:1px solid rgba(0,0,0,.06);">
             <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
@@ -4972,7 +4978,7 @@ window.addEventListener('load', ()=>{
   // 저장된 이름으로 UI 업데이트 (온보딩 완료한 경우)
   const _savedName = localStorage.getItem('duru_user_name');
   if (_savedName) {
-    setTimeout(() => applyUserName(_savedName), 100);
+    setTimeout(() => { applyUserName(_savedName); applyHomeGreetingName(_savedName); }, 100);
   }
 
   // 홈 데이터 초기 로드 (어제 일기 + 유저 이름 Supabase 동기화)
@@ -5103,20 +5109,48 @@ function updateHomeGreetingName(name) {
   applyUserName(name);
 }
 
-function applyUserName(name) {
-  // home-greeting
+function editUserName() {
+  const current = localStorage.getItem('duru_user_name') || '민준';
+  const newName = prompt(`이름을 수정해주세요`, current === '민준' ? '' : current);
+  if (!newName || !newName.trim()) return;
+  const name = newName.trim();
+  localStorage.setItem('duru_user_name', name);
+  if (window._sb) _sb.auth.updateUser({ data: { display_name: name } }).catch(() => {});
+  // mypage 이름 바로 반영
+  const el = document.getElementById('mypage-username');
+  if (el) el.textContent = name + '님';
+  // home-greeting 재생성
   const greetEl = document.getElementById('home-greeting');
-  if (greetEl) greetEl.innerHTML = greetEl.innerHTML.replace(/민준/g, name);
-  // mypage 이름 (안녕하세요, 민준님)
-  document.querySelectorAll('[id^="mypage"]').forEach(el => {
-    if (el.textContent.includes('민준')) el.innerHTML = el.innerHTML.replace(/민준/g, name);
-  });
-  // mypage header 이름 div (font-size:20px)
+  if (greetEl && window._pickGreeting) {
+    const pick = _pickGreeting(null);
+    greetEl.innerHTML = (pick[0] + '<br>' + pick[1]).replace(/민준/g, name);
+  }
+}
+
+function applyUserName(name) {
+  if (!name || name === '민준') return;
+  // home-greeting: initHomeGreeting에서 이미 처리됨, 여기선 mypage만 처리
+  // (home-greeting은 initHomeGreeting에서 _uname으로 직접 삽입하므로 중복 치환 방지)
+
+  // mypage 이름 표시
+  const mpName = document.getElementById('mypage-username');
+  if (mpName) mpName.textContent = name + '님';
+  // mypage 내 기타 텍스트
   document.querySelectorAll('#screen-mypage *').forEach(el => {
+    if (el.id === 'mypage-username') return; // 이미 처리
     if (el.children.length === 0 && el.textContent.includes('민준')) {
       el.textContent = el.textContent.replace(/민준/g, name);
     }
   });
+}
+
+// home-greeting에만 이름 적용 (applyUserName과 분리)
+function applyHomeGreetingName(name) {
+  if (!name || name === '민준') return;
+  const greetEl = document.getElementById('home-greeting');
+  if (greetEl && greetEl.innerHTML.includes('민준')) {
+    greetEl.innerHTML = greetEl.innerHTML.replace(/민준/g, name);
+  }
 }
 
 /* ── 일기 데이터 (Supabase에서 불러옴) ── */
