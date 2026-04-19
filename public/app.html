@@ -2507,8 +2507,25 @@ async function signOut() {
           <span id="font-btn-label" style="font-size:13px;font-weight:800;color:#555;line-height:1;letter-spacing:-.5px;">가<span style="font-size:17px;">가</span></span>
         </button>
         <!-- AI 질문 (두루) -->
-        <button class="write-tb-btn" id="ai-toggle-btn" onclick="toggleAI()" title="두루에게 물어보기">
-          <svg id="ai-toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <button class="write-tb-btn" id="ai-toggle-btn" onclick="toggleAI()" title="두루에게 물어보기" style="position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:4px 6px;border-radius:10px;transition:background .15s;">
+          <!-- 미니 두루 머리 + 반짝이 -->
+          <svg id="ai-toggle-icon" width="22" height="22" viewBox="0 0 36 36" fill="none">
+            <!-- 반짝이 (우상단) -->
+            <line x1="27" y1="3" x2="27" y2="8" stroke="#C0392B" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="24.5" y1="5.5" x2="29.5" y2="5.5" stroke="#C0392B" stroke-width="1.8" stroke-linecap="round"/>
+            <!-- 두루 머리 -->
+            <ellipse cx="16" cy="22" rx="9" ry="8" fill="white" stroke="#1A1A14" stroke-width="1.8"/>
+            <!-- 두루 빨간 모자 -->
+            <ellipse cx="16" cy="13.5" rx="5.5" ry="3.8" fill="#C0392B"/>
+            <ellipse cx="15" cy="12.5" rx="3.5" ry="2.3" fill="#CC3A2A"/>
+            <!-- 두루 눈 -->
+            <ellipse cx="13.5" cy="21.5" rx="2.8" ry="3" fill="white" stroke="#1A1A14" stroke-width="1.2"/>
+            <ellipse cx="14" cy="21.5" rx="1.8" ry="2" fill="#1A1A14"/>
+            <circle cx="14.5" cy="20.5" r="0.7" fill="white"/>
+            <!-- 두루 부리 방향 화살표 -->
+            <path d="M25 20 L30 18 L25 24z" fill="#1A1A14" opacity=".8"/>
+          </svg>
+          <span style="font-size:8px;font-weight:800;color:#C0392B;letter-spacing:-.3px;line-height:1;">두루</span>
           <div id="ai-toggle" style="display:none;"></div>
         </button>
         <div class="write-tb-sep"></div>
@@ -3314,14 +3331,14 @@ let aiTimers = [];
 function clearAiTimers(){ aiTimers.forEach(t=>clearTimeout(t)); aiTimers=[]; }
 
 function toggleAI() {
-  const icon = document.getElementById('ai-toggle-icon');
+  const btn = document.getElementById('ai-toggle-btn');
   if(!aiOpen){
     aiOpen=true;
-    if(icon){ icon.setAttribute('stroke','#C0392B'); icon.setAttribute('fill','rgba(192,57,43,.08)'); }
+    if(btn){ btn.style.background='rgba(192,57,43,.1)'; }
     openAIDuru();
   } else {
     aiOpen=false;
-    if(icon){ icon.setAttribute('stroke','#555'); icon.setAttribute('fill','none'); }
+    if(btn){ btn.style.background=''; }
     closeAIDuru();
   }
 }
