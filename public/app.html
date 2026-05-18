@@ -817,6 +817,10 @@ body{background:#0F0E0C;font-family:'Pretendard',sans-serif;min-height:100vh;dis
 [data-theme="dark"] #mypage-profile-duru ellipse[fill="#C0392B"]{fill:#E8365A !important;}
 [data-theme="dark"] #mypage-profile-duru ellipse[fill="#CC3A2A"]{fill:#F04060 !important;}
 [data-theme="dark"] #mypage-profile-duru path[fill="#1A1A14"]{fill:#D0CBC0 !important;}
+/* 마이페이지 히어로 다크모드 */
+[data-theme="dark"] .mypage-hero{background:linear-gradient(160deg,#221A10 0%,#2A1E0E 100%) !important;}
+[data-theme="dark"] .mypage-stage-badge{background:rgba(255,255,255,.08) !important;color:#C4954A !important;}
+[data-theme="dark"] .mypage-edit-btn{color:#444 !important;}
 /* 스트릭 왕관 단계 애니메이션 */
 @keyframes crownGlow{0%,100%{filter:drop-shadow(0 0 3px #F4D03F) drop-shadow(0 0 7px #F4D03F88);}50%{filter:drop-shadow(0 0 8px #F4D03F) drop-shadow(0 0 16px #F4D03FBB);}}
 @keyframes crownPlatGlow{0%,100%{filter:drop-shadow(0 0 3px #B8D4E8) drop-shadow(0 0 6px #85C1E988);}50%{filter:drop-shadow(0 0 9px #B8D4E8) drop-shadow(0 0 18px #85C1E9BB);}}
@@ -1883,32 +1887,41 @@ async function signOut() {
       </div>
       <div style="flex:1;overflow-y:auto;padding:20px;background:#F9F8F4;">
 
-        <!-- ① 프로필 존 -->
-        <div style="background:white;border-radius:24px;padding:28px 20px 20px;margin-bottom:12px;border:1px solid rgba(0,0,0,.06);text-align:center;">
-          <!-- 두루 캐릭터 (크게, 스트릭 단계별 왕관) -->
-          <div id="mypage-duru-wrap" style="display:inline-block;position:relative;margin-bottom:4px;"></div>
-          <div id="mypage-duru-stage"></div>
-          <!-- 이름 + 수정 -->
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
-            <div id="mypage-username" style="font-size:20px;font-weight:900;color:#1A1A14;">민준</div>
-            <button onclick="editUserName()" style="background:rgba(0,0,0,.06);border:none;border-radius:8px;padding:3px 9px;font-size:11px;font-weight:700;color:#888;font-family:'Pretendard',sans-serif;cursor:pointer;">수정</button>
+        <!-- ① 프로필 존 (리디자인) -->
+        <div style="background:white;border-radius:28px;margin-bottom:12px;border:1px solid rgba(0,0,0,.06);overflow:hidden;">
+          <!-- 히어로 배너 -->
+          <div class="mypage-hero" style="background:linear-gradient(160deg,#FFF4E6 0%,#FFE0BB 100%);padding:32px 20px 20px;text-align:center;">
+            <div id="mypage-duru-stage" class="mypage-stage-badge" style="display:inline-block;font-size:10px;color:#C07030;font-weight:800;background:rgba(255,255,255,.75);border-radius:20px;padding:3px 13px;margin-bottom:10px;letter-spacing:.5px;min-height:18px;line-height:18px;"></div>
+            <div id="mypage-duru-wrap" style="display:flex;justify-content:center;"></div>
           </div>
-          <div style="font-size:12px;color:#BBBBBB;font-weight:500;">두루와 함께한 시간</div>
-          <!-- 통계 3칸 -->
-          <div style="display:flex;margin-top:20px;padding-top:18px;border-top:1px solid rgba(0,0,0,.06);">
-            <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+          <!-- 이름 + 수정 -->
+          <div style="padding:18px 20px 4px;text-align:center;">
+            <div style="display:inline-flex;align-items:center;gap:8px;">
+              <span id="mypage-username" style="font-size:22px;font-weight:900;color:#1A1A14;line-height:1.2;">민준</span>
+              <button onclick="editUserName()" class="mypage-edit-btn" style="background:none;border:none;padding:3px;cursor:pointer;color:#CCCCCC;display:flex;align-items:center;line-height:1;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+            </div>
+            <div style="font-size:12px;color:#BBBBBB;font-weight:500;margin-top:5px;">두루와 함께한 시간</div>
+          </div>
+          <!-- 통계 3칸 (아이콘 포함) -->
+          <div style="display:flex;padding:16px 16px 20px;margin-top:14px;border-top:1px solid rgba(0,0,0,.06);">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#C8C0B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <span style="font-size:10px;color:#BBBBBB;font-weight:600;">총 일기</span>
               <span id="stat-total" style="font-size:22px;font-weight:900;color:#1A1A14;line-height:1;">—</span>
-              <span style="font-size:11px;color:#BBBBBB;font-weight:600;">총 일기</span>
             </div>
-            <div style="width:1px;background:rgba(0,0,0,.07);margin:0 4px;"></div>
-            <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+            <div style="width:1px;background:rgba(0,0,0,.07);"></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <span style="font-size:10px;color:#BBBBBB;font-weight:600;">현재 연속</span>
               <span id="stat-streak" style="font-size:22px;font-weight:900;color:#FF6B35;line-height:1;">—</span>
-              <span style="font-size:11px;color:#BBBBBB;font-weight:600;">현재 연속</span>
             </div>
-            <div style="width:1px;background:rgba(0,0,0,.07);margin:0 4px;"></div>
-            <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+            <div style="width:1px;background:rgba(0,0,0,.07);"></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#C8C0B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <span style="font-size:10px;color:#BBBBBB;font-weight:600;">최장 기록</span>
               <span id="stat-longest" style="font-size:22px;font-weight:900;color:#1A1A14;line-height:1;">—</span>
-              <span style="font-size:11px;color:#BBBBBB;font-weight:600;">최장 기록</span>
             </div>
           </div>
         </div>
@@ -4363,9 +4376,11 @@ function renderMypageDuru(streak) {
     ${_getCrownSVG(stage)}
   </svg>`;
   if (label) {
-    label.textContent = streak > 0
+    const txt = streak > 0
       ? (stage > 0 ? _STAGE_LABELS[stage] : `${streak}일 연속`)
       : '';
+    label.textContent = txt;
+    label.style.visibility = txt ? 'visible' : 'hidden';
   }
 }
 
