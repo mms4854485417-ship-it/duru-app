@@ -671,9 +671,48 @@ body{background:#0F0E0C;font-family:'Pretendard',sans-serif;min-height:100vh;dis
 .feed-react-btn:active{transform:scale(.95);}
 .feed-react-btn.reacted{background:var(--c-bg-card);border-color:#C0392B;color:#C0392B;}
 .feed-react-emoji{font-size:18px;line-height:1;}
-.feed-react-duru{display:block;filter:drop-shadow(0 1px 3px rgba(0,0,0,.1));transition:transform .2s cubic-bezier(.34,1.56,.64,1);}
-.feed-react-btn:active .feed-react-duru{transform:scale(1.15);}
-.feed-react-btn.reacted .feed-react-duru{filter:drop-shadow(0 2px 6px rgba(192,57,43,.25));}
+.feed-react-duru{display:block;filter:drop-shadow(0 1px 3px rgba(0,0,0,.1));}
+
+/* 감정별 reacted 글로우 */
+#react-empathy.reacted .feed-react-duru{filter:drop-shadow(0 0 8px rgba(241,148,138,.7));}
+#react-same.reacted    .feed-react-duru{filter:drop-shadow(0 0 8px rgba(133,193,233,.7));}
+#react-cheer.reacted   .feed-react-duru{filter:drop-shadow(0 0 8px rgba(244,208,63,.7));}
+
+/* 클릭 애니메이션 keyframes */
+@keyframes reactEmpathy{
+  0%  {transform:scale(1) rotate(0deg);}
+  20% {transform:scale(1.28) rotate(-10deg);}
+  45% {transform:scale(1.22) rotate(7deg);}
+  70% {transform:scale(1.12) rotate(-4deg);}
+  100%{transform:scale(1) rotate(0deg);}
+}
+@keyframes reactSame{
+  0%  {transform:translateY(0) rotate(0deg);}
+  30% {transform:translateY(9px) rotate(4deg);}
+  55% {transform:translateY(-3px) rotate(-2deg);}
+  80% {transform:translateY(2px) rotate(1deg);}
+  100%{transform:translateY(0) rotate(0deg);}
+}
+@keyframes reactCheer{
+  0%  {transform:translateY(0) scaleY(1) scaleX(1);}
+  15% {transform:translateY(-4px) scaleY(0.92) scaleX(1.06);}
+  35% {transform:translateY(-22px) scaleY(1.06) scaleX(0.96);}
+  55% {transform:translateY(-26px) scaleY(0.96) scaleX(1.02);}
+  75% {transform:translateY(-10px) scaleY(1.03) scaleX(0.99);}
+  90% {transform:translateY(-2px) scaleY(0.98) scaleX(1.01);}
+  100%{transform:translateY(0) scaleY(1) scaleX(1);}
+}
+@keyframes reactUndo{
+  0%  {transform:scale(1);}
+  35% {transform:scale(0.8);}
+  70% {transform:scale(1.05);}
+  100%{transform:scale(1);}
+}
+/* 트리거 클래스 */
+.feed-react-duru.anim-empathy{animation:reactEmpathy .55s cubic-bezier(.34,1.56,.64,1) both;transform-origin:center center;}
+.feed-react-duru.anim-same   {animation:reactSame    .50s ease both;transform-origin:center center;}
+.feed-react-duru.anim-cheer  {animation:reactCheer   .62s cubic-bezier(.34,1.56,.64,1) both;transform-origin:center bottom;}
+.feed-react-duru.anim-undo   {animation:reactUndo    .35s ease both;transform-origin:center center;}
 .feed-react-label{font-size:10px;font-weight:700;}
 
 /* ── 두루 월간 리포트 ── */
@@ -5469,9 +5508,21 @@ async function toggleReact(key) {
   const wasReacted = !!_expandReacts[key];
   _expandReacts[key] = !wasReacted;
 
-  /* UI 즉시 반영 */
+  /* UI 즉시 반영 + 애니메이션 */
   const btn = document.getElementById('react-' + key);
-  if (btn) btn.classList.toggle('reacted', !!_expandReacts[key]);
+  if (btn) {
+    btn.classList.toggle('reacted', !!_expandReacts[key]);
+    const svg = btn.querySelector('.feed-react-duru');
+    if (svg) {
+      /* 기존 애니메이션 클래스 제거 후 리플로우 */
+      svg.classList.remove('anim-empathy','anim-same','anim-cheer','anim-undo');
+      void svg.offsetWidth;
+      /* 반응 추가면 감정 모션, 취소면 undo */
+      const animClass = _expandReacts[key] ? `anim-${key}` : 'anim-undo';
+      svg.classList.add(animClass);
+      setTimeout(() => svg.classList.remove(animClass), 700);
+    }
+  }
 
   /* 카운트 업데이트 */
   const d = feedData.find(f => f.id === diaryId);
