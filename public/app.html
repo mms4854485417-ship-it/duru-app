@@ -671,6 +671,9 @@ body{background:#0F0E0C;font-family:'Pretendard',sans-serif;min-height:100vh;dis
 .feed-react-btn:active{transform:scale(.95);}
 .feed-react-btn.reacted{background:var(--c-bg-card);border-color:#C0392B;color:#C0392B;}
 .feed-react-emoji{font-size:18px;line-height:1;}
+.feed-react-duru{display:block;filter:drop-shadow(0 1px 3px rgba(0,0,0,.1));transition:transform .2s cubic-bezier(.34,1.56,.64,1);}
+.feed-react-btn:active .feed-react-duru{transform:scale(1.15);}
+.feed-react-btn.reacted .feed-react-duru{filter:drop-shadow(0 2px 6px rgba(192,57,43,.25));}
 .feed-react-label{font-size:10px;font-weight:700;}
 
 /* ── 두루 월간 리포트 ── */
@@ -3245,18 +3248,98 @@ async function signOut() {
         <div id="feed-expand-body"></div>
       </div>
       <div id="feed-expand-footer">
+        <!-- 공감해요: 날개 살짝 들어올림 + 따뜻한 눈 + 하트 -->
         <button class="feed-react-btn" id="react-empathy" onclick="toggleReact('empathy')">
-          <span class="feed-react-emoji">🤍</span>
+          <svg class="feed-react-duru" width="48" height="56" viewBox="-8 -10 138 175" fill="none">
+            <g transform="rotate(-12,20,76)">
+              <path d="M20 70 Q3 59 1 74 Q3 93 20 83" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.2"/>
+            </g>
+            <g transform="rotate(12,78,76)">
+              <path d="M78 70 Q95 59 97 74 Q95 93 78 83" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.2"/>
+            </g>
+            <path d="M37 116 Q33 132 43 138 Q53 142 63 136 Q69 128 65 116" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="1.8"/>
+            <ellipse cx="49" cy="92" rx="32" ry="27" fill="white" stroke="#1A1A14" stroke-width="2.2"/>
+            <path d="M33 116 L26 145" stroke="#1A1A14" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+            <path d="M17 145 Q26 143 32 148" stroke="#1A1A14" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <path d="M63 116 L72 145" stroke="#1A1A14" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+            <path d="M66 145 Q72 143 82 148" stroke="#1A1A14" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <path d="M46 66 Q43 54 46 42 Q48 32 51 21" stroke="#1A1A14" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <ellipse cx="54" cy="15" rx="19" ry="18" fill="white" stroke="#1A1A14" stroke-width="2.1"/>
+            <ellipse cx="52" cy="5" rx="11" ry="7.5" fill="#C0392B"/>
+            <ellipse cx="50" cy="4" rx="7" ry="4.8" fill="#CC3A2A"/>
+            <ellipse cx="47" cy="2" rx="4.5" ry="2.5" fill="rgba(255,255,255,.28)" transform="rotate(-18 47 2)"/>
+            <ellipse cx="44" cy="15" rx="7" ry="7.5" fill="white" stroke="#1A1A14" stroke-width="1.5"/>
+            <ellipse cx="43" cy="14" rx="4.5" ry="5" fill="#1A1A14"/>
+            <circle cx="44.5" cy="12" r="1.6" fill="white"/>
+            <path d="M68 13 L80 10 L68 20z" fill="#1A1A14" opacity=".9"/>
+            <!-- 하트 -->
+            <path d="M49 97 C49 97 37 88 37 81 C37 76 42 73 49 79 C56 73 61 76 61 81 C61 88 49 97 49 97Z" fill="#F1948A" opacity=".75"/>
+          </svg>
           <span class="feed-react-label">공감해요</span>
           <span class="feed-react-count" id="react-empathy-count"></span>
         </button>
+
+        <!-- 나도 그랬어: 날개 살짝 내림 + 눈 아래 + 눈물 -->
         <button class="feed-react-btn" id="react-same" onclick="toggleReact('same')">
-          <span class="feed-react-emoji">🌧</span>
+          <svg class="feed-react-duru" width="48" height="56" viewBox="-8 -10 138 175" fill="none">
+            <g transform="rotate(8,20,76)">
+              <path d="M20 70 Q3 59 1 74 Q3 93 20 83" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.2"/>
+            </g>
+            <g transform="rotate(-8,78,76)">
+              <path d="M78 70 Q95 59 97 74 Q95 93 78 83" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.2"/>
+            </g>
+            <path d="M37 116 Q33 132 43 138 Q53 142 63 136 Q69 128 65 116" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="1.8"/>
+            <ellipse cx="49" cy="92" rx="32" ry="27" fill="white" stroke="#1A1A14" stroke-width="2.2"/>
+            <path d="M33 116 L26 145" stroke="#1A1A14" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+            <path d="M17 145 Q26 143 32 148" stroke="#1A1A14" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <path d="M63 116 L72 145" stroke="#1A1A14" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+            <path d="M66 145 Q72 143 82 148" stroke="#1A1A14" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <path d="M46 66 Q43 54 46 42 Q48 32 51 21" stroke="#1A1A14" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <ellipse cx="54" cy="15" rx="19" ry="18" fill="white" stroke="#1A1A14" stroke-width="2.1"/>
+            <ellipse cx="52" cy="5" rx="11" ry="7.5" fill="#C0392B"/>
+            <ellipse cx="50" cy="4" rx="7" ry="4.8" fill="#CC3A2A"/>
+            <ellipse cx="47" cy="2" rx="4.5" ry="2.5" fill="rgba(255,255,255,.28)" transform="rotate(-18 47 2)"/>
+            <ellipse cx="44" cy="15" rx="7" ry="7.5" fill="white" stroke="#1A1A14" stroke-width="1.5"/>
+            <ellipse cx="42" cy="17" rx="4.5" ry="5" fill="#1A1A14"/>
+            <circle cx="43.5" cy="15" r="1.6" fill="white"/>
+            <path d="M68 13 L80 10 L68 20z" fill="#1A1A14" opacity=".9"/>
+            <!-- 눈물방울 -->
+            <ellipse cx="35" cy="26" rx="2.8" ry="4.2" fill="#85C1E9" opacity=".85"/>
+            <path d="M35 30 Q33 34 35 36 Q37 34 35 30Z" fill="#85C1E9" opacity=".85"/>
+          </svg>
           <span class="feed-react-label">나도 그랬어</span>
           <span class="feed-react-count" id="react-same-count"></span>
         </button>
+
+        <!-- 괜찮아질 거야: 날개 활짝 + 눈 위 + 반짝이 -->
         <button class="feed-react-btn" id="react-cheer" onclick="toggleReact('cheer')">
-          <span class="feed-react-emoji">✨</span>
+          <svg class="feed-react-duru" width="48" height="56" viewBox="-8 -10 138 175" fill="none">
+            <g transform="rotate(-30,20,76)">
+              <path d="M20 70 Q3 59 1 74 Q3 93 20 83" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.2"/>
+            </g>
+            <g transform="rotate(30,78,76)">
+              <path d="M78 70 Q95 59 97 74 Q95 93 78 83" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.2"/>
+            </g>
+            <path d="M37 116 Q33 132 43 138 Q53 142 63 136 Q69 128 65 116" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="1.8"/>
+            <ellipse cx="49" cy="92" rx="32" ry="27" fill="white" stroke="#1A1A14" stroke-width="2.2"/>
+            <path d="M33 116 L26 145" stroke="#1A1A14" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+            <path d="M17 145 Q26 143 32 148" stroke="#1A1A14" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <path d="M63 116 L72 145" stroke="#1A1A14" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+            <path d="M66 145 Q72 143 82 148" stroke="#1A1A14" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <path d="M46 66 Q43 54 46 42 Q48 32 51 21" stroke="#1A1A14" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <ellipse cx="54" cy="15" rx="19" ry="18" fill="white" stroke="#1A1A14" stroke-width="2.1"/>
+            <ellipse cx="52" cy="5" rx="11" ry="7.5" fill="#C0392B"/>
+            <ellipse cx="50" cy="4" rx="7" ry="4.8" fill="#CC3A2A"/>
+            <ellipse cx="47" cy="2" rx="4.5" ry="2.5" fill="rgba(255,255,255,.28)" transform="rotate(-18 47 2)"/>
+            <ellipse cx="44" cy="15" rx="7" ry="7.5" fill="white" stroke="#1A1A14" stroke-width="1.5"/>
+            <ellipse cx="44" cy="13" rx="4.5" ry="5" fill="#1A1A14"/>
+            <circle cx="45.5" cy="11" r="1.6" fill="white"/>
+            <path d="M68 13 L80 10 L68 20z" fill="#1A1A14" opacity=".9"/>
+            <!-- 반짝이 -->
+            <line x1="75" y1="3" x2="78" y2="-4" stroke="#F4D03F" stroke-width="2" stroke-linecap="round"/>
+            <line x1="80" y1="0" x2="86" y2="-4" stroke="#F4D03F" stroke-width="2" stroke-linecap="round"/>
+            <line x1="71" y1="-2" x2="68" y2="-8" stroke="#F4D03F" stroke-width="2" stroke-linecap="round"/>
+          </svg>
           <span class="feed-react-label">괜찮아질 거야</span>
           <span class="feed-react-count" id="react-cheer-count"></span>
         </button>
