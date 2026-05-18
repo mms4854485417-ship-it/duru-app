@@ -4357,7 +4357,12 @@ function renderMypageDuru(streak) {
   const wrap  = document.getElementById('mypage-duru-wrap');
   const label = document.getElementById('mypage-duru-stage');
   if (!wrap) return;
-  wrap.innerHTML = `<svg id="mypage-profile-duru" width="140" height="160" viewBox="-8 -78 216 310" fill="none">
+  // 단계별 왕관 높이에 맞게 viewBox 위쪽만 조정 (캐릭터에 딱 맞게)
+  const vbTop = stage === 0 ? -8 : stage <= 2 ? -26 : stage <= 5 ? -40 : -58;
+  const vbH   = 182 - vbTop;
+  const vbStr = `-15 ${vbTop} 130 ${vbH}`;
+  const svgH  = Math.round(200 * vbH / 130); // width 200 기준 비례 높이
+  wrap.innerHTML = `<svg id="mypage-profile-duru" width="200" height="${svgH}" viewBox="${vbStr}" fill="none" style="display:block;">
     <path d="M22 82 Q2 70 -1 86 Q2 106 22 96" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.4"/>
     <path d="M84 82 Q104 70 107 86 Q104 106 84 96" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.4"/>
     <ellipse cx="53" cy="108" rx="38" ry="32" fill="white" stroke="#1A1A14" stroke-width="2.6"/>
