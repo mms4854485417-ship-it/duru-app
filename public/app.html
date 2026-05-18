@@ -817,6 +817,10 @@ body{background:#0F0E0C;font-family:'Pretendard',sans-serif;min-height:100vh;dis
 [data-theme="dark"] #mypage-profile-duru ellipse[fill="#C0392B"]{fill:#E8365A !important;}
 [data-theme="dark"] #mypage-profile-duru ellipse[fill="#CC3A2A"]{fill:#F04060 !important;}
 [data-theme="dark"] #mypage-profile-duru path[fill="#1A1A14"]{fill:#D0CBC0 !important;}
+/* 마이페이지 두루 아이들 애니메이션 */
+@keyframes duruIdle{0%,100%{transform:translateY(0);}40%{transform:translateY(-6px);}70%{transform:translateY(-3px);}}
+@keyframes duruBlink{0%,90%,100%{transform:scaleY(1);}95%{transform:scaleY(0.1);}}
+#mypage-profile-duru{animation:duruIdle 3s ease-in-out infinite;transform-origin:center bottom;}
 /* 마이페이지 히어로 다크모드 */
 [data-theme="dark"] .mypage-hero{background:linear-gradient(160deg,#1A1A18 0%,#222220 100%) !important;}
 [data-theme="dark"] .mypage-stage-badge{background:rgba(255,255,255,.08) !important;color:#C4954A !important;}
@@ -4362,7 +4366,7 @@ function renderMypageDuru(streak) {
   const vbH   = 182 - vbTop;
   const vbStr = `-15 ${vbTop} 130 ${vbH}`;
   const svgH  = Math.round(200 * vbH / 130); // width 200 기준 비례 높이
-  wrap.innerHTML = `<svg id="mypage-profile-duru" width="200" height="${svgH}" viewBox="${vbStr}" fill="none" style="display:block;">
+  wrap.innerHTML = `<svg id="mypage-profile-duru" width="150" height="${Math.round(svgH*0.75)}" viewBox="${vbStr}" fill="none" style="display:block;">
     <path d="M22 82 Q2 70 -1 86 Q2 106 22 96" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.4"/>
     <path d="M84 82 Q104 70 107 86 Q104 106 84 96" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.4"/>
     <ellipse cx="53" cy="108" rx="38" ry="32" fill="white" stroke="#1A1A14" stroke-width="2.6"/>
