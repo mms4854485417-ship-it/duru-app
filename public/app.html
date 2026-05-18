@@ -817,6 +817,18 @@ body{background:#0F0E0C;font-family:'Pretendard',sans-serif;min-height:100vh;dis
 [data-theme="dark"] #mypage-profile-duru ellipse[fill="#C0392B"]{fill:#E8365A !important;}
 [data-theme="dark"] #mypage-profile-duru ellipse[fill="#CC3A2A"]{fill:#F04060 !important;}
 [data-theme="dark"] #mypage-profile-duru path[fill="#1A1A14"]{fill:#D0CBC0 !important;}
+/* 스트릭 왕관 단계 애니메이션 */
+@keyframes crownGlow{0%,100%{filter:drop-shadow(0 0 3px #F4D03F) drop-shadow(0 0 7px #F4D03F88);}50%{filter:drop-shadow(0 0 8px #F4D03F) drop-shadow(0 0 16px #F4D03FBB);}}
+@keyframes crownPlatGlow{0%,100%{filter:drop-shadow(0 0 3px #B8D4E8) drop-shadow(0 0 6px #85C1E988);}50%{filter:drop-shadow(0 0 9px #B8D4E8) drop-shadow(0 0 18px #85C1E9BB);}}
+@keyframes crownRainbow{0%{filter:drop-shadow(0 0 5px #F1948A);}16%{filter:drop-shadow(0 0 5px #F9E79F);}33%{filter:drop-shadow(0 0 5px #A9DFBF);}50%{filter:drop-shadow(0 0 5px #85C1E9);}66%{filter:drop-shadow(0 0 5px #D2B4DE);}83%{filter:drop-shadow(0 0 5px #F9E79F);}100%{filter:drop-shadow(0 0 5px #F1948A);}}
+@keyframes crownFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-2.5px);}}
+@keyframes legendStarPulse{0%,100%{opacity:.9;transform:scale(1);}50%{opacity:.3;transform:scale(1.4);}}
+.crown-glow{animation:crownGlow 2.2s ease-in-out infinite;}
+.crown-plat-glow{animation:crownPlatGlow 2s ease-in-out infinite;}
+.crown-rainbow{animation:crownRainbow 3s linear infinite;}
+.crown-legend{animation:crownRainbow 2.2s linear infinite,crownFloat 1.8s ease-in-out infinite;}
+#mypage-duru-stage{font-size:10px;color:#BBBBBB;font-weight:700;margin-bottom:8px;letter-spacing:.4px;min-height:15px;text-align:center;}
+[data-theme="dark"] #mypage-duru-stage{color:#666 !important;}
 [data-theme="dark"] #screen-settings>div[style]{background:#111110 !important;}
 [data-theme="dark"] #screen-write{background:#111110 !important;}
 [data-theme="dark"] #screen-emotion{background:linear-gradient(160deg,#1A1710 0%,#141210 100%) !important;}
@@ -1873,34 +1885,9 @@ async function signOut() {
 
         <!-- ① 프로필 존 -->
         <div style="background:white;border-radius:24px;padding:28px 20px 20px;margin-bottom:12px;border:1px solid rgba(0,0,0,.06);text-align:center;">
-          <!-- 두루 캐릭터 (크게) -->
-          <div style="display:inline-block;position:relative;margin-bottom:14px;">
-            <svg id="mypage-profile-duru" width="96" height="110" viewBox="-8 -78 216 310" fill="none">
-              <path d="M22 82 Q2 70 -1 86 Q2 106 22 96" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.4"/>
-              <path d="M84 82 Q104 70 107 86 Q104 106 84 96" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.4"/>
-              <ellipse cx="53" cy="108" rx="38" ry="32" fill="white" stroke="#1A1A14" stroke-width="2.6"/>
-              <path d="M37 130 Q33 146 45 152 Q54 156 64 150 Q70 142 66 130" fill="rgba(26,26,20,.04)" stroke="#1A1A14" stroke-width="2.2"/>
-              <path d="M36 136 L28 172" stroke="#1A1A14" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-              <path d="M66 136 L76 172" stroke="#1A1A14" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-              <path d="M50 78 Q47 64 50 50 Q52 39 55 27" stroke="#1A1A14" stroke-width="3" fill="none" stroke-linecap="round"/>
-              <ellipse cx="58" cy="20" rx="22" ry="21" fill="white" stroke="#1A1A14" stroke-width="2.4"/>
-              <ellipse cx="56" cy="8" rx="13" ry="8.5" fill="#C0392B"/>
-              <ellipse cx="54" cy="7" rx="8.5" ry="5.5" fill="#CC3A2A"/>
-              <ellipse cx="50" cy="5" rx="5.5" ry="3" fill="rgba(255,255,255,.28)" transform="rotate(-18 50 5)"/>
-              <ellipse cx="50" cy="20" rx="7" ry="7.5" fill="white" stroke="#1A1A14" stroke-width="1.5"/>
-              <ellipse cx="51" cy="20" rx="4.5" ry="5" fill="#1A1A14"/>
-              <circle cx="52.5" cy="18" r="1.6" fill="white"/>
-              <path d="M74 18 L88 15 L74 25z" fill="#1A1A14" opacity=".9"/>
-              <!-- 왕관 -->
-              <g transform="translate(34,-14)">
-                <path d="M4 14 L8 6 L14 12 L20 4 L26 12 L32 6 L36 14 Z" fill="#F4D03F" stroke="#E8B800" stroke-width="1.2" stroke-linejoin="round"/>
-                <rect x="4" y="13" width="32" height="6" rx="2" fill="#F4D03F" stroke="#E8B800" stroke-width="1"/>
-                <circle cx="14" cy="9" r="2" fill="#C0392B"/>
-                <circle cx="20" cy="5" r="2.2" fill="#C0392B"/>
-                <circle cx="26" cy="9" r="2" fill="#C0392B"/>
-              </g>
-            </svg>
-          </div>
+          <!-- 두루 캐릭터 (크게, 스트릭 단계별 왕관) -->
+          <div id="mypage-duru-wrap" style="display:inline-block;position:relative;margin-bottom:4px;"></div>
+          <div id="mypage-duru-stage"></div>
           <!-- 이름 + 수정 -->
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
             <div id="mypage-username" style="font-size:20px;font-weight:900;color:#1A1A14;">민준님</div>
@@ -4237,6 +4224,151 @@ const releasedData = [
 ];
 let curReleasedIdx = null;
 
+/* ── 스트릭 왕관 업그레이드 시스템 ── */
+function _getStreakStage(s) {
+  if (s >= 365) return 8;
+  if (s >= 180) return 7;
+  if (s >= 100) return 6;
+  if (s >= 60)  return 5;
+  if (s >= 30)  return 4;
+  if (s >= 14)  return 3;
+  if (s >= 7)   return 2;
+  if (s >= 3)   return 1;
+  return 0;
+}
+function _getCrownSVG(stage) {
+  switch(stage) {
+    case 0: return ''; // 왕관 없음 — 기본 두루
+    case 1: // 3일: 작은 순금 왕관
+      return `<g transform="translate(38,-10)">
+        <path d="M3 10 L6 4 L12 8 L18 2 L24 8 L27 4 L30 10 Z" fill="#F4D03F" stroke="#E8B800" stroke-width="1" stroke-linejoin="round"/>
+        <rect x="3" y="9" width="27" height="5" rx="1.5" fill="#F4D03F" stroke="#E8B800" stroke-width=".8"/>
+      </g>`;
+    case 2: // 7일: 왕관 + 루비 1개
+      return `<g transform="translate(36,-12)">
+        <path d="M3 12 L7 5 L13 10 L18 3 L23 10 L29 5 L33 12 Z" fill="#F4D03F" stroke="#E8B800" stroke-width="1.1" stroke-linejoin="round"/>
+        <rect x="3" y="11" width="30" height="5.5" rx="1.5" fill="#F4D03F" stroke="#E8B800" stroke-width=".9"/>
+        <circle cx="18" cy="5" r="2.3" fill="#C0392B"/>
+      </g>`;
+    case 3: // 14일: 왕관 + 루비 3개 풀세트
+      return `<g transform="translate(34,-14)">
+        <path d="M4 14 L8 6 L14 12 L20 4 L26 12 L32 6 L36 14 Z" fill="#F4D03F" stroke="#E8B800" stroke-width="1.2" stroke-linejoin="round"/>
+        <rect x="4" y="13" width="32" height="6" rx="2" fill="#F4D03F" stroke="#E8B800" stroke-width="1"/>
+        <circle cx="14" cy="9" r="2" fill="#C0392B"/>
+        <circle cx="20" cy="5" r="2.2" fill="#C0392B"/>
+        <circle cx="26" cy="9" r="2" fill="#C0392B"/>
+      </g>`;
+    case 4: // 30일: 황금 왕관 + 별 + glow
+      return `<g transform="translate(33,-16)" class="crown-glow">
+        <path d="M4 14 L8 5 L15 11 L20 3 L25 11 L32 5 L36 14 Z" fill="#F4D03F" stroke="#E8B800" stroke-width="1.3" stroke-linejoin="round"/>
+        <rect x="4" y="13" width="32" height="6.5" rx="2" fill="#F4D03F" stroke="#E8B800" stroke-width="1.1"/>
+        <circle cx="15" cy="8" r="2.2" fill="#C0392B"/>
+        <circle cx="20" cy="4" r="2.5" fill="#C0392B"/>
+        <circle cx="25" cy="8" r="2.2" fill="#C0392B"/>
+        <text x="20" y="-3" text-anchor="middle" font-size="6" fill="#FFF176">✦</text>
+      </g>`;
+    case 5: // 60일: 더 큰 왕관 + 별 반짝 3개 + glow
+      return `<g transform="translate(31,-18)" class="crown-glow">
+        <path d="M4 16 L9 7 L16 13 L22 4 L28 13 L35 7 L40 16 Z" fill="#F4D03F" stroke="#E8B800" stroke-width="1.4" stroke-linejoin="round"/>
+        <rect x="4" y="15" width="36" height="7" rx="2" fill="#F4D03F" stroke="#E8B800" stroke-width="1.1"/>
+        <circle cx="16" cy="10" r="2.4" fill="#C0392B"/>
+        <circle cx="22" cy="5.5" r="2.8" fill="#C0392B"/>
+        <circle cx="28" cy="10" r="2.4" fill="#C0392B"/>
+        <text x="22" y="-3" text-anchor="middle" font-size="7" fill="#FFF176">✦</text>
+        <text x="8" y="2" text-anchor="middle" font-size="5" fill="#FFD700" opacity=".75">✦</text>
+        <text x="36" y="2" text-anchor="middle" font-size="5" fill="#FFD700" opacity=".75">✦</text>
+      </g>`;
+    case 6: // 100일: 백금/은 왕관 + 다이아 💎
+      return `<g transform="translate(30,-20)" class="crown-plat-glow">
+        <path d="M4 18 L10 7 L17 14 L22 4 L27 14 L34 7 L40 18 Z" fill="#D6EAF8" stroke="#85C1E9" stroke-width="1.5" stroke-linejoin="round"/>
+        <rect x="4" y="17" width="36" height="7.5" rx="2.5" fill="#D6EAF8" stroke="#85C1E9" stroke-width="1.2"/>
+        <circle cx="17" cy="10.5" r="2.5" fill="#2E86C1"/>
+        <polygon points="22,3 24,8.5 29.5,8.5 25,11.5 26.8,17 22,14 17.2,17 19,11.5 14.5,8.5 20,8.5" fill="#85C1E9" opacity=".9" transform="translate(0,0.5) scale(0.9) translate(2.4,0)"/>
+        <circle cx="27" cy="10.5" r="2.5" fill="#2E86C1"/>
+        <text x="22" y="-3" text-anchor="middle" font-size="7" fill="#AED6F1">✦</text>
+      </g>`;
+    case 7: // 180일: 레인보우 왕관 + 무지개 오라
+      return `<g transform="translate(29,-22)" class="crown-rainbow">
+        <defs>
+          <linearGradient id="rbGrd" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#F1948A"/>
+            <stop offset="25%" stop-color="#F9E79F"/>
+            <stop offset="50%" stop-color="#A9DFBF"/>
+            <stop offset="75%" stop-color="#85C1E9"/>
+            <stop offset="100%" stop-color="#D2B4DE"/>
+          </linearGradient>
+        </defs>
+        <path d="M4 19 L10 7 L17 15 L23 3 L29 15 L36 7 L42 19 Z" fill="url(#rbGrd)" stroke="#F9E79F" stroke-width="1.6" stroke-linejoin="round"/>
+        <rect x="4" y="18" width="38" height="8" rx="2.5" fill="url(#rbGrd)" stroke="#F9E79F" stroke-width="1.2"/>
+        <circle cx="17" cy="11" r="2.8" fill="white" stroke="#F9E79F" stroke-width=".8"/>
+        <circle cx="23" cy="4.5" r="3.2" fill="white" stroke="#F9E79F" stroke-width=".8"/>
+        <circle cx="29" cy="11" r="2.8" fill="white" stroke="#F9E79F" stroke-width=".8"/>
+        <text x="23" y="-4" text-anchor="middle" font-size="8" fill="#F9E79F">✦</text>
+        <text x="7" y="2" text-anchor="middle" font-size="6" fill="#F1948A" opacity=".8">✦</text>
+        <text x="39" y="2" text-anchor="middle" font-size="6" fill="#85C1E9" opacity=".8">✦</text>
+      </g>`;
+    case 8: // 365일: 전설의 왕관 ✦
+    default:
+      return `<g transform="translate(27,-26)" class="crown-legend">
+        <defs>
+          <linearGradient id="lgGrd" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FFF9C4"/>
+            <stop offset="40%" stop-color="#F4D03F"/>
+            <stop offset="100%" stop-color="#E67E22"/>
+          </linearGradient>
+        </defs>
+        <path d="M4 21 L11 7 L18 16 L25 2 L32 16 L39 7 L46 21 Z" fill="url(#lgGrd)" stroke="#F39C12" stroke-width="1.9" stroke-linejoin="round"/>
+        <rect x="4" y="20" width="42" height="8.5" rx="3" fill="url(#lgGrd)" stroke="#F39C12" stroke-width="1.5"/>
+        <circle cx="18" cy="12" r="3" fill="#E8365A"/>
+        <polygon points="25,1 27,7.5 33.5,7.5 28.5,11 30.5,17.5 25,14 19.5,17.5 21.5,11 16.5,7.5 23,7.5" fill="white" opacity=".95"/>
+        <circle cx="32" cy="12" r="3" fill="#2E86C1"/>
+        <text x="8" y="-2" text-anchor="middle" font-size="8" fill="#FFF9C4" opacity=".9" style="animation:legendStarPulse 1.6s ease-in-out infinite">✦</text>
+        <text x="42" y="-2" text-anchor="middle" font-size="8" fill="#FFF9C4" opacity=".9" style="animation:legendStarPulse 1.6s ease-in-out infinite .5s">✦</text>
+        <text x="25" y="-10" text-anchor="middle" font-size="9" fill="white" style="animation:legendStarPulse 1.6s ease-in-out infinite .25s">★</text>
+      </g>`;
+  }
+}
+const _STAGE_LABELS = [
+  '',
+  '3일 연속 🌱',
+  '7일 연속 ✨',
+  '14일 연속 🌟',
+  '30일 연속 👑',
+  '60일 연속 💫',
+  '100일 연속 💎',
+  '180일 연속 🌈',
+  '365일 연속 ⭐',
+];
+function renderMypageDuru(streak) {
+  const stage = _getStreakStage(streak);
+  const wrap  = document.getElementById('mypage-duru-wrap');
+  const label = document.getElementById('mypage-duru-stage');
+  if (!wrap) return;
+  wrap.innerHTML = `<svg id="mypage-profile-duru" width="96" height="110" viewBox="-8 -78 216 310" fill="none">
+    <path d="M22 82 Q2 70 -1 86 Q2 106 22 96" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.4"/>
+    <path d="M84 82 Q104 70 107 86 Q104 106 84 96" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.4"/>
+    <ellipse cx="53" cy="108" rx="38" ry="32" fill="white" stroke="#1A1A14" stroke-width="2.6"/>
+    <path d="M37 130 Q33 146 45 152 Q54 156 64 150 Q70 142 66 130" fill="rgba(26,26,20,.04)" stroke="#1A1A14" stroke-width="2.2"/>
+    <path d="M36 136 L28 172" stroke="#1A1A14" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <path d="M66 136 L76 172" stroke="#1A1A14" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <path d="M50 78 Q47 64 50 50 Q52 39 55 27" stroke="#1A1A14" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <ellipse cx="58" cy="20" rx="22" ry="21" fill="white" stroke="#1A1A14" stroke-width="2.4"/>
+    <ellipse cx="56" cy="8" rx="13" ry="8.5" fill="#C0392B"/>
+    <ellipse cx="54" cy="7" rx="8.5" ry="5.5" fill="#CC3A2A"/>
+    <ellipse cx="50" cy="5" rx="5.5" ry="3" fill="rgba(255,255,255,.28)" transform="rotate(-18 50 5)"/>
+    <ellipse cx="50" cy="20" rx="7" ry="7.5" fill="white" stroke="#1A1A14" stroke-width="1.5"/>
+    <ellipse cx="51" cy="20" rx="4.5" ry="5" fill="#1A1A14"/>
+    <circle cx="52.5" cy="18" r="1.6" fill="white"/>
+    <path d="M74 18 L88 15 L74 25z" fill="#1A1A14" opacity=".9"/>
+    ${_getCrownSVG(stage)}
+  </svg>`;
+  if (label) {
+    label.textContent = streak > 0
+      ? (stage > 0 ? _STAGE_LABELS[stage] : `${streak}일 연속`)
+      : '';
+  }
+}
+
 async function loadMypageStats() {
   const { data: { user } } = await _sb.auth.getUser();
   if (!user) return;
@@ -4246,6 +4378,7 @@ async function loadMypageStats() {
       const el = document.getElementById(id);
       if (el) el.textContent = '0';
     });
+    renderMypageDuru(0);
     return;
   }
   // 총 일기
@@ -4269,6 +4402,7 @@ async function loadMypageStats() {
   const lastDate = new Date(dates[dates.length-1]); lastDate.setHours(0,0,0,0);
   const diffToday = (today - lastDate) / 86400000;
   streak = diffToday <= 1 ? cur : 0;
+  renderMypageDuru(streak);
 
   const totalEl   = document.getElementById('stat-total');
   const streakEl  = document.getElementById('stat-streak');
