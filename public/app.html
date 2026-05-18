@@ -702,6 +702,26 @@ body{background:#0F0E0C;font-family:'Pretendard',sans-serif;min-height:100vh;dis
 [data-theme="dark"] .report-highlight-text{color:#888 !important;}
 [data-theme="dark"] .report-highlight-text strong{color:#D0CCC4 !important;}
 
+/* ── Draft 자동저장 토스트 ── */
+#draft-toast{position:absolute;top:0;left:0;right:0;z-index:300;background:#1A1A14;padding:14px 18px;display:flex;align-items:center;gap:10px;transform:translateY(-100%);transition:transform .32s cubic-bezier(.16,1,.3,1);}
+#draft-toast.show{transform:translateY(0);}
+#draft-toast-text{flex:1;font-size:13px;font-weight:600;color:white;line-height:1.4;}
+#draft-toast-restore{background:#C0392B;border:none;border-radius:10px;padding:7px 14px;font-size:12px;font-weight:800;color:white;font-family:'Pretendard',sans-serif;cursor:pointer;white-space:nowrap;}
+#draft-toast-dismiss{background:rgba(255,255,255,.12);border:none;border-radius:10px;padding:7px 12px;font-size:12px;font-weight:700;color:rgba(255,255,255,.7);font-family:'Pretendard',sans-serif;cursor:pointer;white-space:nowrap;}
+
+/* ── 홈 오늘 감정 배지 ── */
+#home-today-badge{position:absolute;top:8px;right:8px;display:flex;align-items:center;gap:5px;background:white;border-radius:20px;padding:5px 10px 5px 7px;box-shadow:0 2px 10px rgba(0,0,0,.1);border:1px solid rgba(0,0,0,.06);opacity:0;transform:translateY(6px) scale(.95);transition:opacity .4s ease,transform .4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;}
+#home-today-badge.show{opacity:1;transform:translateY(0) scale(1);}
+#home-today-badge-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+#home-today-badge-text{font-size:11px;font-weight:700;color:#1A1A14;}
+.home-duru{position:relative;}
+[data-theme="dark"] #home-today-badge{background:#252520;border-color:rgba(255,255,255,.08);box-shadow:0 2px 10px rgba(0,0,0,.3);}
+[data-theme="dark"] #home-today-badge-text{color:#E8E4DC;}
+
+/* ── 피드 반응 버튼 카운트 ── */
+.feed-react-count{font-size:10px;font-weight:700;color:#aaa;margin-top:1px;}
+.feed-react-btn.reacted .feed-react-count{color:#C0392B;}
+
 /* ── 방향성 화면 전환 ── */
 @keyframes screenInFromRight{from{opacity:0;transform:translateX(30px);}to{opacity:1;transform:translateX(0);}}
 @keyframes screenInFromLeft{from{opacity:0;transform:translateX(-30px);}to{opacity:1;transform:translateX(0);}}
@@ -1191,6 +1211,20 @@ async function initHomeData() {
     const entry = await loadYesterdayDiary();
     updateYesterdayCard(entry);
   } catch(e) {}
+
+  // ③ 오늘 일기 → 두루 감정 배지
+  try {
+    const { data: { user } } = await _sb.auth.getUser();
+    if (user) {
+      const todayStr = _getDiaryDateStr ? _getDiaryDateStr() : (() => {
+        const n = new Date();
+        return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
+      })();
+      const { data: todayDiary } = await _sb.from('diaries')
+        .select('emotion').eq('user_id', user.id).eq('date', todayStr).maybeSingle();
+      showTodayEmotionBadge(todayDiary?.emotion || null);
+    }
+  } catch(e) {}
 }
 
 // 어제 일기 카드 UI 업데이트
@@ -1564,6 +1598,11 @@ async function signOut() {
             <circle cx="76" cy="8" r="5" fill="rgba(255,180,200,.82)"/>
             <circle cx="76" cy="8" r="2.8" fill="rgba(255,230,100,.9)"/>
           </svg>
+          <!-- 오늘 감정 배지 -->
+          <div id="home-today-badge">
+            <div id="home-today-badge-dot"></div>
+            <span id="home-today-badge-text">오늘 기록 완료</span>
+          </div>
         </div>
 
         <!-- 두루 코멘트 위젯 -->
@@ -2517,6 +2556,12 @@ async function signOut() {
 
     <!-- ══════ 화면2: 일기 작성 ══════ -->
     <div class="screen" id="screen-write">
+      <!-- Draft 복원 토스트 -->
+      <div id="draft-toast">
+        <div id="draft-toast-text">이전에 쓰다 만 일기가 있어요</div>
+        <button id="draft-toast-dismiss" onclick="hideDraftToast()">버리기</button>
+        <button id="draft-toast-restore" onclick="restoreDraft()">이어쓰기</button>
+      </div>
       <!-- 헤더 -->
       <div style="height:50px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 20px;border-bottom:1px solid rgba(0,0,0,.06);flex-shrink:0;position:relative;z-index:20;">
         <button class="write-back" onclick="goTo('screen-home')" style="justify-self:start;">
@@ -3203,14 +3248,17 @@ async function signOut() {
         <button class="feed-react-btn" id="react-empathy" onclick="toggleReact('empathy')">
           <span class="feed-react-emoji">🤍</span>
           <span class="feed-react-label">공감해요</span>
+          <span class="feed-react-count" id="react-empathy-count"></span>
         </button>
         <button class="feed-react-btn" id="react-same" onclick="toggleReact('same')">
           <span class="feed-react-emoji">🌧</span>
           <span class="feed-react-label">나도 그랬어</span>
+          <span class="feed-react-count" id="react-same-count"></span>
         </button>
         <button class="feed-react-btn" id="react-cheer" onclick="toggleReact('cheer')">
           <span class="feed-react-emoji">✨</span>
           <span class="feed-react-label">괜찮아질 거야</span>
+          <span class="feed-react-count" id="react-cheer-count"></span>
         </button>
       </div>
     </div>
@@ -3318,17 +3366,20 @@ function goTo(id) {
     setTimeout(resetEmoDuru, 100);
   }
   if (id === 'screen-write') {
+    attachDraftListeners();
     loadDiaryFromSupabase(_getDiaryDateStr()).then(data => {
-      if (!data) return;
       const titleEl = document.querySelector('.write-title-input');
       const bodyEl  = document.querySelector('.write-body-input');
       if (!titleEl || !bodyEl) return;
-      if (data.content) {
+      if (data?.content) {
         const parts = data.content.split('\n\n');
         titleEl.value = parts[0] || '';
         bodyEl.value  = parts.slice(1).join('\n\n') || '';
+        clearDraft(); // Supabase 데이터 있으면 draft 불필요
+      } else {
+        checkAndRestoreDraft(); // 오늘 일기 없으면 draft 확인
       }
-    }).catch(() => {});
+    }).catch(() => { checkAndRestoreDraft(); });
   }
 }
 
@@ -3793,6 +3844,7 @@ function handleSave() {
     const isPublic = sel?.dataset?.s === '공유';
     const saveType = isPublic ? 'public' : 'private';
     saveDiaryToSupabase(_getDiaryDateStr(), _getDiaryContent(), _getDiaryEmotion(), isPublic, saveType).catch(console.error);
+    clearDraft(); // 저장 성공 → draft 삭제
     showSaveComplete(isPublic ? 'public' : 'private');
   }
 }
@@ -5081,6 +5133,7 @@ const _EMOTION_TINT = {
 let _expandedCardEl = null;
 let _expandSwipeStartY = 0;
 let _expandReacts = {};
+let _expandDiaryId  = null;
 
 function openFeedModal(i) {
   curModalIdx = i;
@@ -5107,11 +5160,16 @@ function openFeedModal(i) {
   document.getElementById('feed-expand-body').textContent = d.body;
   document.getElementById('feed-expand-scroll').scrollTop = 0;
 
-  /* 4. 반응 버튼 상태 초기화 */
-  _expandReacts = {};
+  /* 4. 반응 버튼 상태 — localStorage에서 복원 */
+  _expandDiaryId = d.id || null;
+  const savedReacts = _expandDiaryId ? _loadUserReacts(_expandDiaryId) : {};
+  _expandReacts = { ...savedReacts };
   ['empathy','same','cheer'].forEach(k => {
     const btn = document.getElementById('react-' + k);
-    if (btn) btn.classList.remove('reacted');
+    if (btn) btn.classList.toggle('reacted', !!_expandReacts[k]);
+    /* 카운트 표시 */
+    const col = k === 'empathy' ? 'reaction_empathy' : k === 'same' ? 'reaction_same' : 'reaction_cheer';
+    _updateReactCount(k, d[col] || 0);
   });
 
   /* 5. expand 패널을 카드 위치·크기로 시작 (display:flex + 카드 rect) */
@@ -5209,10 +5267,159 @@ function closeFeedExpand() {
 function closeFeedModal(e) { closeFeedExpand(); }
 function toggleModalLike() {}
 
-function toggleReact(key) {
-  _expandReacts[key] = !_expandReacts[key];
+/* ── 홈 오늘 감정 배지 ── */
+function showTodayEmotionBadge(emotionStr) {
+  const badge   = document.getElementById('home-today-badge');
+  const dot     = document.getElementById('home-today-badge-dot');
+  const text    = document.getElementById('home-today-badge-text');
+  if (!badge) return;
+  if (!emotionStr) { badge.classList.remove('show'); return; }
+  const firstName = emotionStr.split(', ')[0];
+  const color = _EMOTION_DOT?.[firstName] || '#888';
+  if (dot)  dot.style.background = color;
+  if (text) text.textContent = firstName + ' · 오늘 기록 ✓';
+  badge.classList.add('show');
+  /* 두루 애니메이션 감정별 변화 */
+  _applyDuruMood(firstName);
+}
+
+const _DURU_MOODS = {
+  '기쁨':   { filter:'drop-shadow(0 0 12px rgba(244,208,63,.5))',  duration:'3.5s' },
+  '설렘':   { filter:'drop-shadow(0 0 10px rgba(241,148,138,.5))', duration:'3s'   },
+  '평온':   { filter:'drop-shadow(0 0 8px rgba(133,193,233,.4))',  duration:'6s'   },
+  '우울':   { filter:'drop-shadow(0 0 6px rgba(93,138,168,.3))',   duration:'8s'   },
+  '외로움': { filter:'drop-shadow(0 0 6px rgba(127,140,141,.3))',  duration:'8s'   },
+  '불안':   { filter:'drop-shadow(0 0 8px rgba(149,165,166,.3))',  duration:'4s'   },
+  '슬픔':   { filter:'drop-shadow(0 0 6px rgba(174,182,191,.3))',  duration:'9s'   },
+  '화남':   { filter:'drop-shadow(0 0 10px rgba(192,57,43,.3))',   duration:'5s'   },
+  '분노':   { filter:'drop-shadow(0 0 10px rgba(192,57,43,.3))',   duration:'5s'   },
+  '공허함': { filter:'drop-shadow(0 0 4px rgba(189,195,199,.25))', duration:'10s'  },
+};
+function _applyDuruMood(emotion) {
+  const svg = document.getElementById('home-duru-svg');
+  if (!svg) return;
+  const mood = _DURU_MOODS[emotion];
+  if (!mood) return;
+  svg.style.filter = mood.filter;
+  svg.style.animationDuration = mood.duration;
+}
+
+/* ── Draft 자동저장 ── */
+let _draftTimer = null;
+const DRAFT_KEY = 'duru_draft';
+
+function scheduleDraft() {
+  clearTimeout(_draftTimer);
+  _draftTimer = setTimeout(saveDraft, 1200);
+}
+function saveDraft() {
+  const title   = document.querySelector('.write-title-input')?.value || '';
+  const body    = document.querySelector('.write-body-input')?.value  || '';
+  const date    = _getDiaryDateStr?.() || '';
+  const emotion = _getDiaryEmotion?.() || '';
+  if (!title.trim() && !body.trim()) { clearDraft(); return; }
+  localStorage.setItem(DRAFT_KEY, JSON.stringify({ title, body, date, emotion, ts: Date.now() }));
+}
+function clearDraft() {
+  localStorage.removeItem(DRAFT_KEY);
+  clearTimeout(_draftTimer);
+}
+function checkAndRestoreDraft() {
+  const raw = localStorage.getItem(DRAFT_KEY);
+  if (!raw) return;
+  try {
+    const draft = JSON.parse(raw);
+    const today = _getDiaryDateStr?.() || '';
+    if (draft.date !== today) { clearDraft(); return; }      // 다른 날 draft → 무효
+    const titleEl = document.querySelector('.write-title-input');
+    const bodyEl  = document.querySelector('.write-body-input');
+    if ((titleEl?.value || '').trim() || (bodyEl?.value || '').trim()) {
+      clearDraft(); return; // Supabase에서 불러온 내용 있으면 draft 무시
+    }
+    const toast = document.getElementById('draft-toast');
+    if (toast) { toast._draft = draft; toast.classList.add('show'); }
+  } catch(e) { clearDraft(); }
+}
+function restoreDraft() {
+  const toast = document.getElementById('draft-toast');
+  const draft = toast?._draft;
+  if (!draft) { hideDraftToast(); return; }
+  const titleEl = document.querySelector('.write-title-input');
+  const bodyEl  = document.querySelector('.write-body-input');
+  if (titleEl) titleEl.value = draft.title;
+  if (bodyEl)  bodyEl.value  = draft.body;
+  hideDraftToast();
+}
+function hideDraftToast() {
+  const toast = document.getElementById('draft-toast');
+  if (toast) toast.classList.remove('show');
+  clearDraft();
+}
+
+/* 입력창에 이벤트 연결 (화면 첫 렌더 이후 한 번만) */
+let _draftListenersAttached = false;
+function attachDraftListeners() {
+  if (_draftListenersAttached) return;
+  const titleEl = document.querySelector('.write-title-input');
+  const bodyEl  = document.querySelector('.write-body-input');
+  if (!titleEl || !bodyEl) return;
+  titleEl.addEventListener('input', scheduleDraft);
+  bodyEl.addEventListener('input',  scheduleDraft);
+  _draftListenersAttached = true;
+}
+
+/* ── 피드 반응 (Supabase 저장) ── */
+const _REACT_COLS = { empathy:'reaction_empathy', same:'reaction_same', cheer:'reaction_cheer' };
+
+function _getReactStorageKey(diaryId) { return `duru_react_${diaryId}`; }
+function _loadUserReacts(diaryId) {
+  try { return JSON.parse(localStorage.getItem(_getReactStorageKey(diaryId)) || '{}'); } catch{ return {}; }
+}
+function _saveUserReacts(diaryId, reacts) {
+  localStorage.setItem(_getReactStorageKey(diaryId), JSON.stringify(reacts));
+}
+
+async function toggleReact(key) {
+  const diaryId = _expandDiaryId;
+  if (!diaryId) return;
+
+  const wasReacted = !!_expandReacts[key];
+  _expandReacts[key] = !wasReacted;
+
+  /* UI 즉시 반영 */
   const btn = document.getElementById('react-' + key);
   if (btn) btn.classList.toggle('reacted', !!_expandReacts[key]);
+
+  /* 카운트 업데이트 */
+  const d = feedData.find(f => f.id === diaryId);
+  if (d) {
+    const col = key === 'empathy' ? 'reaction_empathy' : key === 'same' ? 'reaction_same' : 'reaction_cheer';
+    d[col] = Math.max(0, (d[col] || 0) + (wasReacted ? -1 : 1));
+    _updateReactCount(key, d[col]);
+  }
+
+  /* localStorage 저장 */
+  const userReacts = _loadUserReacts(diaryId);
+  if (_expandReacts[key]) userReacts[key] = true; else delete userReacts[key];
+  _saveUserReacts(diaryId, userReacts);
+
+  /* Supabase 저장 (실패해도 무시) */
+  try {
+    const col = _REACT_COLS[key];
+    const delta = wasReacted ? -1 : 1;
+    const { data: cur } = await _sb.from('diaries').select(col).eq('id', diaryId).maybeSingle();
+    if (cur) {
+      const newVal = Math.max(0, (cur[col] || 0) + delta);
+      await _sb.from('diaries').update({ [col]: newVal }).eq('id', diaryId);
+      if (d) d[col] = newVal;
+      _updateReactCount(key, newVal);
+    }
+  } catch(e) { /* 컬럼 없거나 오프라인 → localStorage만 유지 */ }
+}
+
+function _updateReactCount(key, val) {
+  const el = document.getElementById(`react-${key}-count`);
+  if (el) el.textContent = val > 0 ? val : '';
 }
 
 async function initFeed() {
@@ -5228,13 +5435,17 @@ async function initFeed() {
       const emotions = emotionNames.map(e => ({ e, dot: _EMOTION_DOT[e] || '#888' }));
       const parts = (row.content || '').split('\n\n');
       return {
-        e:      emotions[0]?.e   || '',
-        dot:    emotions[0]?.dot || '#888',
+        id:                row.id,
+        e:                 emotions[0]?.e   || '',
+        dot:               emotions[0]?.dot || '#888',
         emotions,
-        title:  parts[0] || '제목 없음',
-        body:   parts.slice(1).join('\n\n') || '',
-        time:   formatRelativeTime(row.updated_at),
-        likes:  0,
+        title:             parts[0] || '제목 없음',
+        body:              parts.slice(1).join('\n\n') || '',
+        time:              formatRelativeTime(row.updated_at),
+        likes:             0,
+        reaction_empathy:  row.reaction_empathy || 0,
+        reaction_same:     row.reaction_same    || 0,
+        reaction_cheer:    row.reaction_cheer   || 0,
       };
     });
     feedData.length = 0;
