@@ -1890,7 +1890,7 @@ async function signOut() {
           <div id="mypage-duru-stage"></div>
           <!-- 이름 + 수정 -->
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
-            <div id="mypage-username" style="font-size:20px;font-weight:900;color:#1A1A14;">민준님</div>
+            <div id="mypage-username" style="font-size:20px;font-weight:900;color:#1A1A14;">민준</div>
             <button onclick="editUserName()" style="background:rgba(0,0,0,.06);border:none;border-radius:8px;padding:3px 9px;font-size:11px;font-weight:700;color:#888;font-family:'Pretendard',sans-serif;cursor:pointer;">수정</button>
           </div>
           <div style="font-size:12px;color:#BBBBBB;font-weight:500;">두루와 함께한 시간</div>
@@ -6100,7 +6100,7 @@ function editUserName() {
   if (window._sb) _sb.auth.updateUser({ data: { display_name: name } }).catch(() => {});
   // mypage 이름 바로 반영
   const el = document.getElementById('mypage-username');
-  if (el) el.textContent = name + '님';
+  if (el) el.textContent = name;
   // home-greeting 재생성
   const greetEl = document.getElementById('home-greeting');
   if (greetEl && window._pickGreeting) {
@@ -6116,7 +6116,7 @@ function applyUserName(name) {
 
   // mypage 이름 표시
   const mpName = document.getElementById('mypage-username');
-  if (mpName) mpName.textContent = name + '님';
+  if (mpName) mpName.textContent = name;
   // mypage 내 기타 텍스트
   document.querySelectorAll('#screen-mypage *').forEach(el => {
     if (el.id === 'mypage-username') return; // 이미 처리
