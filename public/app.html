@@ -808,6 +808,15 @@ body{background:#0F0E0C;font-family:'Pretendard',sans-serif;min-height:100vh;dis
 [data-theme="dark"] #screen-feed{background:#0E0E0C !important;}
 [data-theme="dark"] #screen-record>div[style]{background:#111110 !important;}
 [data-theme="dark"] #screen-mypage>div[style]{background:#111110 !important;}
+/* 마이페이지 프로필 두루 다크모드 */
+[data-theme="dark"] #mypage-profile-duru [stroke="#1A1A14"]{stroke:#D0CBC0 !important;}
+[data-theme="dark"] #mypage-profile-duru ellipse[fill="white"]{fill:#2A2A24 !important;}
+[data-theme="dark"] #mypage-profile-duru path[fill="white"]{fill:#2A2A24 !important;}
+[data-theme="dark"] #mypage-profile-duru [fill="rgba(26,26,20,.05)"]{fill:rgba(255,255,255,.07) !important;}
+[data-theme="dark"] #mypage-profile-duru [fill="rgba(26,26,20,.04)"]{fill:rgba(255,255,255,.06) !important;}
+[data-theme="dark"] #mypage-profile-duru ellipse[fill="#C0392B"]{fill:#E8365A !important;}
+[data-theme="dark"] #mypage-profile-duru ellipse[fill="#CC3A2A"]{fill:#F04060 !important;}
+[data-theme="dark"] #mypage-profile-duru path[fill="#1A1A14"]{fill:#D0CBC0 !important;}
 [data-theme="dark"] #screen-settings>div[style]{background:#111110 !important;}
 [data-theme="dark"] #screen-write{background:#111110 !important;}
 [data-theme="dark"] #screen-emotion{background:linear-gradient(160deg,#1A1710 0%,#141210 100%) !important;}
@@ -1866,7 +1875,7 @@ async function signOut() {
         <div style="background:white;border-radius:24px;padding:28px 20px 20px;margin-bottom:12px;border:1px solid rgba(0,0,0,.06);text-align:center;">
           <!-- 두루 캐릭터 (크게) -->
           <div style="display:inline-block;position:relative;margin-bottom:14px;">
-            <svg width="96" height="110" viewBox="-8 -78 216 310" fill="none">
+            <svg id="mypage-profile-duru" width="96" height="110" viewBox="-8 -78 216 310" fill="none">
               <path d="M22 82 Q2 70 -1 86 Q2 106 22 96" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.4"/>
               <path d="M84 82 Q104 70 107 86 Q104 106 84 96" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.4"/>
               <ellipse cx="53" cy="108" rx="38" ry="32" fill="white" stroke="#1A1A14" stroke-width="2.6"/>
