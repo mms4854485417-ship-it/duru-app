@@ -4353,26 +4353,39 @@ function renderMypageDuru(streak) {
   // 단계별 왕관 높이에 맞게 viewBox 위쪽만 조정 (캐릭터에 딱 맞게)
   const vbTop = stage === 0 ? -8 : stage <= 2 ? -26 : stage <= 5 ? -40 : -58;
   const vbH   = 210 - vbTop; // 발 y=195 + 여유 15
-  const vbStr = `-15 ${vbTop} 130 ${vbH}`;
-  const svgH  = Math.round(150 * vbH / 130); // width=150 기준 비례 높이
-  wrap.innerHTML = `<svg id="mypage-profile-duru" width="150" height="${svgH}" viewBox="${vbStr}" fill="none" style="display:block;">
-    <path d="M22 82 Q2 70 -1 86 Q2 106 22 96" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.4"/>
-    <path d="M84 82 Q104 70 107 86 Q104 106 84 96" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.4"/>
+  // viewBox: 발끝 y=174 + 여유, x는 홈 두루와 동일 범위
+  const vbBottom = 185;
+  const vbH2 = vbBottom - vbTop;
+  const svgH  = Math.round(150 * vbH2 / 116); // x폭 116(-8~108) 기준
+  wrap.innerHTML = `<svg id="mypage-profile-duru" width="150" height="${svgH}" viewBox="-8 ${vbTop} 116 ${vbH2}" fill="none" style="display:block;">
+    <!-- 날개 — 홈 두루와 동일 -->
+    <path d="M22 82 Q2 70 -1 86 Q2 106 22 96" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.2"/>
+    <path d="M84 82 Q104 70 107 86 Q104 106 84 96" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.2"/>
+    <!-- 몸통 -->
     <ellipse cx="53" cy="108" rx="38" ry="32" fill="white" stroke="#1A1A14" stroke-width="2.6"/>
-    <path d="M37 130 Q33 146 45 152 Q54 156 64 150 Q70 142 66 130" fill="rgba(26,26,20,.04)" stroke="#1A1A14" stroke-width="2.2"/>
+    <!-- 꼬리 -->
+    <path d="M37 130 Q33 146 45 152 Q54 156 64 150 Q70 142 66 130" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.2"/>
+    <!-- 목 -->
     <path d="M50 78 Q47 64 50 50 Q52 39 55 27" stroke="#1A1A14" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <!-- 머리 -->
     <ellipse cx="58" cy="20" rx="22" ry="21" fill="white" stroke="#1A1A14" stroke-width="2.4"/>
+    <!-- 정수리 -->
     <ellipse cx="56" cy="8" rx="13" ry="8.5" fill="#C0392B"/>
     <ellipse cx="54" cy="7" rx="8.5" ry="5.5" fill="#CC3A2A"/>
     <ellipse cx="50" cy="5" rx="5.5" ry="3" fill="rgba(255,255,255,.28)" transform="rotate(-18 50 5)"/>
+    <!-- 눈 -->
     <ellipse cx="50" cy="20" rx="7" ry="7.5" fill="white" stroke="#1A1A14" stroke-width="1.5"/>
     <ellipse cx="51" cy="20" rx="4.5" ry="5" fill="#1A1A14"/>
     <circle cx="52.5" cy="18" r="1.6" fill="white"/>
+    <!-- 부리 -->
     <path d="M74 18 L88 15 L74 25z" fill="#1A1A14" opacity=".9"/>
+    <!-- 왕관 -->
     ${_getCrownSVG(stage)}
-    <!-- 다리: 모든 요소 위에 마지막으로 그려서 덮임 방지 -->
-    <path d="M44 138 L37 188" stroke="#1A1A14" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-    <path d="M61 138 L69 188" stroke="#1A1A14" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <!-- 다리+발 — 홈 두루와 완전 동일, 마지막에 그려서 덮임 방지 -->
+    <path d="M36 136 L28 172" stroke="#1A1A14" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <path d="M17 172 Q28 169 34 174" stroke="#1A1A14" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <path d="M66 136 L76 172" stroke="#1A1A14" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <path d="M70 172 Q76 169 88 174" stroke="#1A1A14" stroke-width="1.8" fill="none" stroke-linecap="round"/>
   </svg>`;
   if (label) {
     const txt = streak > 0
