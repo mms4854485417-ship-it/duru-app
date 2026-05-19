@@ -4436,8 +4436,7 @@ function renderMypageDuru(streak) {
     label.textContent = txt;
     label.style.visibility = txt ? 'visible' : 'hidden';
   }
-  // 두루 탭 → 단계표 열기
-  const wrap = document.getElementById('mypage-duru-wrap');
+  // 두루 탭 → 단계표 열기 (위에서 이미 선언된 wrap 재사용)
   if (wrap) wrap.onclick = () => openStageChart(stage, streak);
   // 왕관 업그레이드 감지
   const saved = parseInt(localStorage.getItem('duru_crown_stage') ?? '-1');
