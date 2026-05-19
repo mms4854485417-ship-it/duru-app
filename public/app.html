@@ -4371,8 +4371,6 @@ function renderMypageDuru(streak) {
     <path d="M84 82 Q104 70 107 86 Q104 106 84 96" fill="rgba(26,26,20,.05)" stroke="#1A1A14" stroke-width="2.4"/>
     <ellipse cx="53" cy="108" rx="38" ry="32" fill="white" stroke="#1A1A14" stroke-width="2.6"/>
     <path d="M37 130 Q33 146 45 152 Q54 156 64 150 Q70 142 66 130" fill="rgba(26,26,20,.04)" stroke="#1A1A14" stroke-width="2.2"/>
-    <path d="M36 138 L24 195" stroke="#1A1A14" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-    <path d="M66 138 L80 195" stroke="#1A1A14" stroke-width="2.2" fill="none" stroke-linecap="round"/>
     <path d="M50 78 Q47 64 50 50 Q52 39 55 27" stroke="#1A1A14" stroke-width="3" fill="none" stroke-linecap="round"/>
     <ellipse cx="58" cy="20" rx="22" ry="21" fill="white" stroke="#1A1A14" stroke-width="2.4"/>
     <ellipse cx="56" cy="8" rx="13" ry="8.5" fill="#C0392B"/>
@@ -4383,6 +4381,9 @@ function renderMypageDuru(streak) {
     <circle cx="52.5" cy="18" r="1.6" fill="white"/>
     <path d="M74 18 L88 15 L74 25z" fill="#1A1A14" opacity=".9"/>
     ${_getCrownSVG(stage)}
+    <!-- 다리: 모든 요소 위에 마지막으로 그려서 덮임 방지 -->
+    <path d="M40 150 L28 200" stroke="#1A1A14" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <path d="M63 150 L77 200" stroke="#1A1A14" stroke-width="2.6" fill="none" stroke-linecap="round"/>
   </svg>`;
   if (label) {
     const txt = streak > 0
